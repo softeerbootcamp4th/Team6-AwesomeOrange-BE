@@ -44,27 +44,15 @@
 ## ERD
 <img width="686" alt="image" src="https://github.com/user-attachments/assets/eece7379-ad7b-4b29-b0bb-ae4bc20a7104">
 
-## Issue & TroubleShooting
-[Issue & TroubleShooting](https://github.com/softeerbootcamp4th/Team6-AwesomeOrange-BE/wiki/%5BIssue-&-TroubleShooting%5D)
-
 ## Tech Stack
 
 ### Front-End
-- Javascript ES2020+
-- React
-- Tailwindcss
-- Vite
-- Zustand
+<img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=JavaScript&logoColor=black"><img src="https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=React&logoColor=black"><img src="https://img.shields.io/badge/TailwindCSS-06B6D4?style=for-the-badge&logo=Tailwind CSS&logoColor=white"><img src="https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=Vite&logoColor=purple"><img src="https://img.shields.io/badge/Zustand-DDA0DD?style=for-the-badge&logo=Zustand&logoColor=purple">
 
 ### Back-End
-- Spring Boot 3.2.2
-- Java 17
-- MySQL 8.0
-- Redis
-- AWS EC2
-- AssertJ
-- Grafana
-- Docker
-- Github Actions
+<img src="https://img.shields.io/badge/Spring Boot-6DB33F?style=for-the-badge&logo=Spring Boot&logoColor=black"><img src="https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=MySQL&logoColor=black"><img src="https://img.shields.io/badge/Redis-FF4438?style=for-the-badge&logo=Redis&logoColor=black"><img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=Docker&logoColor=black"><img src="https://img.shields.io/badge/Grafana-F46800?style=for-the-badge&logo=Grafana&logoColor=black">
+
+## Issue & TroubleShooting
+[Issue & TroubleShooting](https://github.com/softeerbootcamp4th/Team6-AwesomeOrange-BE/wiki/%5BIssue-&-TroubleShooting%5D)
 
 ## Project Archeitecture
