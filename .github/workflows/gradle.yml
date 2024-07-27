@@ -24,7 +24,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v1
+        uses: gradle/actions/setup-gradle@ec92e829475ac0c2315ea8f9eced72db85bb337a # v3.0.0
 
         # TODO: 추후 테스트코드 작성 후 테스트 실패 시 CI 불가능하도록 수정
       - name: Build with Gradle
