@@ -43,6 +43,7 @@ jobs:
         run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/orange
 
   CD:
+    if: github.event.pull_request.merged == true && github.ref == 'refs/heads/dev'
     runs-on: self-hosted
     needs: CI
 
