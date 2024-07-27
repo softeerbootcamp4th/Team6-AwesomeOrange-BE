@@ -37,5 +37,7 @@ out/
 .vscode/
 
 ### project
+*.sh
+*.yml
 *.yaml
 *.properties
