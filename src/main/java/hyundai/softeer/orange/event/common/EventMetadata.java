@@ -14,6 +14,9 @@ public class EventMetadata {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique = true)
+    private String eventId;
+
     @Column(length=80)
     private String name;
 
@@ -36,6 +39,6 @@ public class EventMetadata {
     @JoinColumn(name="event_frame_id")
     private EventFrame eventFrame;
 
-    @OneToMany(mappedBy = "event_metadata")
+    @OneToMany(mappedBy = "eventMetadata")
     private List<DrawEvent> drawEventList = new ArrayList<>();
 }

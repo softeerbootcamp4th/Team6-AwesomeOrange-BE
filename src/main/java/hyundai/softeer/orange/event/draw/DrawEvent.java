@@ -15,17 +15,16 @@ public class DrawEvent {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column
-    private String eventId;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="event_metadata_id")
     private EventMetadata eventMetadata;
 
-    @OneToMany(mappedBy ="draw_event")
+    @OneToMany(mappedBy ="drawEvent")
     private List<DrawEventScorePolicy> policyList = new ArrayList<>();
-    @OneToMany(mappedBy ="draw_event")
+
+    @OneToMany(mappedBy ="drawEvent")
     private List<DrawEventMetadata> metadataList = new ArrayList<>();
-    @OneToMany(mappedBy ="draw_event")
+
+    @OneToMany(mappedBy ="drawEvent")
     private List<DrawEventWinningInfo> winningInfoList = new ArrayList<>();
 }

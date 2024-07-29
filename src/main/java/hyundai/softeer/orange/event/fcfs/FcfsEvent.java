@@ -32,6 +32,6 @@ public class FcfsEvent {
     @JoinColumn(name = "event_metadata_id")
     private EventMetadata eventMetadata;
 
-    @OneToMany(mappedBy = "fsfs_event")
+    @OneToMany(mappedBy = "fcfsEvent")
     private List<FcfsEventWinningInfo> infos = new ArrayList<>();
 }

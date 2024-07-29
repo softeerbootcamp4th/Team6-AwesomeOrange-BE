@@ -29,6 +29,6 @@ public class EventUser {
     @JoinColumn(name = "event_frame_id")
     private EventFrame eventFrame;
 
-    @OneToMany(mappedBy = "event_user")
+    @OneToMany(mappedBy = "eventUser")
     private List<Comment> commentList = new ArrayList<>();
 }

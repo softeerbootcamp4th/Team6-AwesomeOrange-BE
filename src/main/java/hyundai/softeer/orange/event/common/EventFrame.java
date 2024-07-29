@@ -19,12 +19,12 @@ public class EventFrame {
     @Column
     private String name;
 
-    @OneToMany(mappedBy="event_frame")
+    @OneToMany(mappedBy="eventFrame")
     private List<EventMetadata> eventMetadataList = new ArrayList<>();
 
-    @OneToMany(mappedBy="event_frame")
+    @OneToMany(mappedBy="eventFrame")
     private List<EventUser> eventUserList = new ArrayList<>();
 
-    @OneToMany(mappedBy="event_frame")
+    @OneToMany(mappedBy="eventFrame")
     private List<Comment> commentList = new ArrayList<>();
 }
