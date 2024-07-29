@@ -1,5 +1,6 @@
 package hyundai.softeer.orange.event.draw.entity;
 
+import hyundai.softeer.orange.eventuser.entity.EventUser;
 import jakarta.persistence.*;
 import lombok.Getter;
 
@@ -12,9 +13,14 @@ public class DrawEventWinningInfo {
     private Long id;
 
     @Column
-    private Long rank;
+    private Long ranking;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "draw_event_id")
     private DrawEvent drawEvent;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "event_user_id")
+    private EventUser eventUser;
+
 }
