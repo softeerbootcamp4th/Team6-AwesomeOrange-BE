@@ -6,6 +6,7 @@ on:
     branches: [ "dev" ]
   pull_request:
     branches: [ "dev" ]
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -43,11 +44,17 @@ jobs:
         run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/orange
 
   CD:
-    if: github.event.pull_request.merged == true && github.ref == 'refs/heads/dev'
     runs-on: self-hosted
     needs: CI
+    if: github.event.pull_request.merged == true
 
     steps:
+      - name: Docker Login
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
       - name: Remove Docker Container
         run: sudo docker rm -f orange || true
 
