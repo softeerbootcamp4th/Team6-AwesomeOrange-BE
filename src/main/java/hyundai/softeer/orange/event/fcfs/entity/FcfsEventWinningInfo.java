@@ -1,4 +1,4 @@
-package hyundai.softeer.orange.event.fcfs;
+package hyundai.softeer.orange.event.fcfs.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;

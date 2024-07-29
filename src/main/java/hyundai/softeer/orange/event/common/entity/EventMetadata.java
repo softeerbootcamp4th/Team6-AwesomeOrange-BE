@@ -1,6 +1,8 @@
-package hyundai.softeer.orange.event.common;
+package hyundai.softeer.orange.event.common.entity;
 
-import hyundai.softeer.orange.event.draw.DrawEvent;
+import hyundai.softeer.orange.event.common.enums.EventStatus;
+import hyundai.softeer.orange.event.common.enums.EventType;
+import hyundai.softeer.orange.event.draw.entity.DrawEvent;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;

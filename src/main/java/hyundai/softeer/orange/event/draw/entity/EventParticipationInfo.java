@@ -1,6 +1,5 @@
-package hyundai.softeer.orange.event.participationinfo;
+package hyundai.softeer.orange.event.draw.entity;
 
-import hyundai.softeer.orange.event.draw.DrawEvent;
 import hyundai.softeer.orange.eventuser.entity.EventUser;
 import jakarta.persistence.*;
 import lombok.Getter;

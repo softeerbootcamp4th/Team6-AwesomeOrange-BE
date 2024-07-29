@@ -1,7 +1,7 @@
 package hyundai.softeer.orange.eventuser.entity;
 
-import hyundai.softeer.orange.comment.Comment;
-import hyundai.softeer.orange.event.common.EventFrame;
+import hyundai.softeer.orange.comment.entity.Comment;
+import hyundai.softeer.orange.event.common.entity.EventFrame;
 import jakarta.persistence.*;
 import lombok.Getter;
 

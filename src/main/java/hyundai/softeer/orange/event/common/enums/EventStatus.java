@@ -1,4 +1,4 @@
-package hyundai.softeer.orange.event.common;
+package hyundai.softeer.orange.event.common.enums;
 
 public enum EventStatus {
     READY,

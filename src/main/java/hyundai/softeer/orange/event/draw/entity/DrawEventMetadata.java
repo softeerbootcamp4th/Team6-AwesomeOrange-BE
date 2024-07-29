@@ -1,4 +1,4 @@
-package hyundai.softeer.orange.event.draw;
+package hyundai.softeer.orange.event.draw.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
