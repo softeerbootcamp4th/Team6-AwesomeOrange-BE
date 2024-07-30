@@ -7,7 +7,7 @@ import hyundai.softeer.orange.comment.entity.Comment;
 import hyundai.softeer.orange.comment.exception.CommentException;
 import hyundai.softeer.orange.comment.repository.CommentRepository;
 import hyundai.softeer.orange.common.ErrorCode;
-import hyundai.softeer.orange.common.util.StringUtil;
+import hyundai.softeer.orange.common.util.ConstantUtil;
 import hyundai.softeer.orange.event.common.entity.EventFrame;
 import hyundai.softeer.orange.event.common.repository.EventFrameRepository;
 import hyundai.softeer.orange.eventuser.entity.EventUser;
@@ -31,7 +31,7 @@ public class CommentService {
 
     // 주기적으로 무작위 추출되는 긍정 기대평 목록을 조회한다.
     @Transactional(readOnly = true)
-    @Cacheable(value = "comments", key = StringUtil.COMMENTS_KEY)
+    @Cacheable(value = "comments", key = ConstantUtil.COMMENTS_KEY)
     public ResponseCommentsDto getComments() {
         List<ResponseCommentDto> comments = commentRepository.findRandomPositiveComments(20)
                 .stream()

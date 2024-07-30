@@ -1,6 +1,5 @@
 package hyundai.softeer.orange.common;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import hyundai.softeer.orange.comment.exception.CommentException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,11 +25,6 @@ public class GlobalExceptionHandler {
             errors.put(fieldName, errorMessage);
         });
         return ResponseEntity.badRequest().body(errors);
-    }
-
-    @ExceptionHandler(JsonProcessingException.class)
-    public ResponseEntity<String> handleJsonProcessException(JsonProcessingException e) {
-        return ResponseEntity.status(ErrorCode.INVALID_JSON.getHttpStatus()).body(ErrorCode.INVALID_JSON.getMessage());
     }
 
     @ExceptionHandler(CommentException.class)
