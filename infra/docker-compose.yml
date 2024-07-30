@@ -1,0 +1,22 @@
+services:
+  spring_server:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+#    env_file:
+#      - ./.env
+    volumes:
+      # 로그 파일 경로 잡기
+      - /var/log:/var/log
+    ports:
+      - 8080:8080
+  promtail:
+    image: grafana/promtail
+    env_file:
+      - ./.env.promtail
+    volumes:
+      - ./promtail-config.yml:/etc/promtail/config.yml
+      - /var/log:/var/log
+    command:
+      -config.file=/etc/promtail/config.yml
+      -config.expand-env=true

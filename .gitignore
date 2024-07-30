@@ -38,6 +38,7 @@ out/
 
 ### project
 *.sh
-*.yml
-*.yaml
+**/resources/*.yml
 *.properties
+**/*.env*
+**/.DS_store
