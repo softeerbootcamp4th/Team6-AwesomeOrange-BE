@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @Column(length = 100)
     private String content;
@@ -29,4 +29,16 @@ public class Comment {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="event_user_id")
     private EventUser eventUser;
+
+    // 긍정 기대평 여부
+    private Boolean isPositive;
+
+    public static Comment of(String content, EventFrame eventFrame, EventUser eventUser, Boolean isPositive) {
+        Comment comment = new Comment();
+        comment.content = content;
+        comment.eventFrame = eventFrame;
+        comment.eventUser = eventUser;
+        comment.isPositive = isPositive;
+        return comment;
+    }
 }
