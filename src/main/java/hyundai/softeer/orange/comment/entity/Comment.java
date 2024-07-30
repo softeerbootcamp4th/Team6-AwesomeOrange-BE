@@ -3,12 +3,15 @@ package hyundai.softeer.orange.comment.entity;
 import hyundai.softeer.orange.event.common.entity.EventFrame;
 import hyundai.softeer.orange.eventuser.entity.EventUser;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
 
 @Table(name="comment")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Entity
 public class Comment {
@@ -38,6 +41,7 @@ public class Comment {
         comment.content = content;
         comment.eventFrame = eventFrame;
         comment.eventUser = eventUser;
+        comment.createdAt = LocalDateTime.now(); // FIXME: 현재 테스트 시 자동 생성되지 않고 있음
         comment.isPositive = isPositive;
         return comment;
     }
