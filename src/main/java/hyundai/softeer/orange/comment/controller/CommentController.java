@@ -37,7 +37,7 @@ public class CommentController {
             @ApiResponse(responseCode = "400", description = "기대평 등록 실패, 지나치게 부정적인 표현으로 간주될 때"),
             @ApiResponse(responseCode = "409", description = "하루에 여러 번의 기대평을 작성하려 할 때")
     })
-    public ResponseEntity<Long> createComment(@RequestBody @Valid CreateCommentDto dto) {
+    public ResponseEntity<Boolean> createComment(@RequestBody @Valid CreateCommentDto dto) {
         boolean isPositive = apiService.analyzeComment(dto.getContent());
         return ResponseEntity.ok(commentService.createComment(dto, isPositive));
     }

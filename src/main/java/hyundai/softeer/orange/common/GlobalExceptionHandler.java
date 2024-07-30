@@ -28,7 +28,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(CommentException.class)
-    public ResponseEntity<String> handleCommentException(CommentException e) {
-        return ResponseEntity.status(e.getErrorCode().getHttpStatus()).body(e.getMessage());
+    public ResponseEntity<ErrorResponse> handleCommentException(CommentException e) {
+        return ResponseEntity.status(e.getErrorCode().getHttpStatus()).body(ErrorResponse.from(e.getErrorCode()));
     }
 }
