@@ -40,7 +40,8 @@ public class CommentController {
     @PostMapping
     @Operation(summary = "기대평 등록", description = "유저가 신규 기대평을 등록한다.", responses = {
             @ApiResponse(responseCode = "200", description = "기대평 등록 성공"),
-            @ApiResponse(responseCode = "400", description = "기대평 등록 실패, 지나치게 부정적인 표현으로 간주될 때")
+            @ApiResponse(responseCode = "400", description = "기대평 등록 실패, 지나치게 부정적인 표현으로 간주될 때"),
+            @ApiResponse(responseCode = "409", description = "하루에 여러 번의 기대평을 작성하려 할 때")
     })
     public ResponseEntity<Long> createComment(@RequestBody @Valid CreateCommentDto dto) throws JsonProcessingException {
         HttpHeaders headers = new HttpHeaders();

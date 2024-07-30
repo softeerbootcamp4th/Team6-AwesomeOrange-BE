@@ -43,6 +43,11 @@ public class CommentService {
     // 신규 기대평을 등록한다.
     @Transactional
     public Long createComment(CreateCommentDto dto, Boolean isPositive) {
+        // 하루에 여러 번의 기대평을 작성하려 할 때 예외처리
+        if(commentRepository.existsByCreatedDateAndEventUser(dto.getEventUserId())) {
+            throw new CommentException(ErrorCode.COMMENT_ALREADY_EXISTS);
+        }
+
         EventFrame eventFrame = eventFrameRepository.findById(dto.getEventFrameId())
                 .orElseThrow(() -> new CommentException(ErrorCode.EVENT_FRAME_NOT_FOUND));
         EventUser eventUser = eventUserRepository.findById(dto.getEventUserId())
