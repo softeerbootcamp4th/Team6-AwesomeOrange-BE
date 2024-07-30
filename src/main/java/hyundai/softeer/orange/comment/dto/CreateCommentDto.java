@@ -17,10 +17,4 @@ public class CreateCommentDto {
 
     @Size(min = 1, max = 100, message = "정해진 크기를 벗어났습니다.")
     private String content;
-
-    public CreateCommentDto(Long eventUserId, Long eventFrameId, String content) {
-        this.eventUserId = eventUserId;
-        this.eventFrameId = eventFrameId;
-        this.content = content;
-    }
 }
