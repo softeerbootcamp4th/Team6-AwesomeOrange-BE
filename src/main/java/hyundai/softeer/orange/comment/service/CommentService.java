@@ -33,7 +33,7 @@ public class CommentService {
     @Transactional(readOnly = true)
     @Cacheable(value = "comments", key = ConstantUtil.COMMENTS_KEY)
     public ResponseCommentsDto getComments() {
-        List<ResponseCommentDto> comments = commentRepository.findRandomPositiveComments(20)
+        List<ResponseCommentDto> comments = commentRepository.findRandomPositiveComments(ConstantUtil.COMMENTS_SIZE)
                 .stream()
                 .map(ResponseCommentDto::from)
                 .toList();
@@ -60,6 +60,10 @@ public class CommentService {
     // 기대평을 삭제한다. 이 동작을 실행하는 주체가 어드민임이 반드시 검증되어야 한다.
     @Transactional
     public Long deleteComment(Long commentId) {
+        if(!commentRepository.existsById(commentId)) {
+            throw new CommentException(ErrorCode.COMMENT_NOT_FOUND);
+        }
+
         commentRepository.deleteById(commentId);
         return commentId;
     }

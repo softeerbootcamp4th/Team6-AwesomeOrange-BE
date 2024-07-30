@@ -10,4 +10,5 @@ public class ConstantUtil {
     public static final String CLIENT_ID = "X-NCP-APIGW-API-KEY-ID";
     public static final String CLIENT_SECRET = "X-NCP-APIGW-API-KEY";
     public static final double LIMIT_NEGATIVE_CONFIDENCE = 99.5;
+    public static final int COMMENTS_SIZE = 20;
 }

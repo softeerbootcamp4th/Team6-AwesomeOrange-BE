@@ -2,11 +2,15 @@ package hyundai.softeer.orange.comment.dto;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Builder
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
 public class CreateCommentDto {
 
     @NotNull(message = "잘못된 값이 입력되었거나 값이 누락되었습니다.")
