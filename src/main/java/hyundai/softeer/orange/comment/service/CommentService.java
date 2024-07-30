@@ -47,7 +47,7 @@ public class CommentService {
                 .orElseThrow(() -> new CommentException(ErrorCode.EVENT_FRAME_NOT_FOUND));
         EventUser eventUser = eventUserRepository.findById(dto.getEventUserId())
                 .orElseThrow(() -> new CommentException(ErrorCode.EVENT_USER_NOT_FOUND));
-
+        // TODO: 점수정책와 연계하여 기대평 등록 시 점수를 부여 추가해야함
         Comment comment = Comment.of(dto.getContent(), eventFrame, eventUser, isPositive);
         return commentRepository.save(comment).getId();
     }
