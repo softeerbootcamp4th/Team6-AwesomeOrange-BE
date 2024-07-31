@@ -17,6 +17,8 @@ public enum ErrorCode {
     // 401 Unauthorized
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, false, "인증되지 않은 사용자입니다."),
     AUTHENTICATION_FAILED(HttpStatus.UNAUTHORIZED, false, "아이디 또는 비밀번호가 일치하지 않습니다"),
+    INVALID_AUTH_CODE(HttpStatus.UNAUTHORIZED, false, "인증번호가 일치하지 않습니다."),
+    SESSION_EXPIRED(HttpStatus.UNAUTHORIZED, false, "세션이 만료되었습니다."),
 
     // 403 Forbidden
     FORBIDDEN(HttpStatus.FORBIDDEN, false, "권한이 없습니다."),

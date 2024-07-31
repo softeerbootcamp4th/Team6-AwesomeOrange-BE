@@ -18,7 +18,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 import java.util.List;
 import java.util.Optional;
@@ -53,7 +52,7 @@ class CommentServiceTest {
             .eventFrameId(1L)
             .content("test")
             .build();
-    EventUser eventUser = EventUser.of("test", "01012345678", null);
+    EventUser eventUser = EventUser.of("test", "01012345678", null, "uuid");
     EventFrame eventFrame = EventFrame.of("eventFrame");
 
     @DisplayName("getComments: 무작위 긍정 기대평 목록을 조회한다.")

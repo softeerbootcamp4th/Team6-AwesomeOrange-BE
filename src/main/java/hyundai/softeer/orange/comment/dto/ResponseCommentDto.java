@@ -21,7 +21,7 @@ public class ResponseCommentDto {
         return ResponseCommentDto.builder()
                 .id(comment.getId())
                 .content(comment.getContent())
-                .userName(comment.getEventUser().getUsername())
+                .userName(comment.getEventUser().getUserName())
                 .createdAt(comment.getCreatedAt().toString())
                 .build();
     }

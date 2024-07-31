@@ -22,10 +22,13 @@ public class EventUser {
     private Long id;
 
     @Column
-    private String username;
+    private String userName;
 
     @Column
     private String phoneNumber;
+
+    @Column(unique = true, nullable = false)
+    private String userId;
 
     @Column
     private Integer score;
@@ -43,10 +46,11 @@ public class EventUser {
     @OneToMany(mappedBy = "eventUser")
     private List<FcfsEventWinningInfo> fcfsEventWinningInfoList = new ArrayList<>();
 
-    public static EventUser of(String username, String phoneNumber, EventFrame eventFrame) {
+    public static EventUser of(String userName, String phoneNumber, EventFrame eventFrame, String uuid) {
         EventUser eventUser = new EventUser();
-        eventUser.username = username;
+        eventUser.userName = userName;
         eventUser.phoneNumber = phoneNumber;
+        eventUser.userId = uuid;
         eventUser.score = 0;
         eventUser.eventFrame = eventFrame;
         return eventUser;
