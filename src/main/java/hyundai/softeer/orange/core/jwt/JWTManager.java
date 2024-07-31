@@ -1,4 +1,4 @@
-package hyundai.softeer.orange.jwt;
+package hyundai.softeer.orange.core.jwt;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.jackson.io.JacksonDeserializer;
@@ -17,6 +17,7 @@ import java.util.Map;
 public class JWTManager {
     private SecretKey secretKey;
 
+    // jwt.secret을 properties에 넣어야 함!
     @Autowired
     public void setSecretKey(@Value("{jwt.secret}") String secretKey) {
         this.secretKey = getDecodedSecretKey(secretKey);

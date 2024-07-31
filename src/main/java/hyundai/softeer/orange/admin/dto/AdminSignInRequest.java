@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 
 @Getter
-public class AdminSignInDto {
+public class AdminSignInRequest {
     @NotBlank
     private String username;
 

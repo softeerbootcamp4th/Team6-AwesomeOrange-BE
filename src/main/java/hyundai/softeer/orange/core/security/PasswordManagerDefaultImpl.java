@@ -1,4 +1,4 @@
-package hyundai.softeer.orange.security;
+package hyundai.softeer.orange.core.security;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -10,7 +10,7 @@ import java.util.Base64;
 @Slf4j
 @Component
 public class PasswordManagerDefaultImpl implements PasswordManager {
-    private static final String SEPARATOR = "\\$";
+    private static final String SEPARATOR = "@";
 
     @Override
     public String encrypt(String password) {
@@ -23,9 +23,9 @@ public class PasswordManagerDefaultImpl implements PasswordManager {
     private String getSaltedPassword(String password, String salt) {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
+            String passwordWithSalt = password + salt;
 
-            String saltWithPassword = password + salt;
-            md.update(saltWithPassword.getBytes());
+            md.update(passwordWithSalt.getBytes());
             return Base64.getEncoder().encodeToString(md.digest());
         } catch (NoSuchAlgorithmException e) {
             log.error(e.getMessage());
@@ -40,7 +40,7 @@ public class PasswordManagerDefaultImpl implements PasswordManager {
         String saltedPassword = beforePasswordInfo[0];
         String salt = beforePasswordInfo[1];
 
-        String newSaltedPassword = getSaltedPassword(encryptedPassword, salt);
+        String newSaltedPassword = getSaltedPassword(password, salt);
 
         return saltedPassword.equals(newSaltedPassword);
     }

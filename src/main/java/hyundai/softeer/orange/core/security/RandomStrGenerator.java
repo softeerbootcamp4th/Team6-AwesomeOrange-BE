@@ -1,4 +1,4 @@
-package hyundai.softeer.orange.security;
+package hyundai.softeer.orange.core.security;
 
 public class RandomStrGenerator {
     private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
