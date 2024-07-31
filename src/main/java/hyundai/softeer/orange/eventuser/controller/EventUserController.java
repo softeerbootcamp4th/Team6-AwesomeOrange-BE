@@ -4,6 +4,7 @@ import hyundai.softeer.orange.common.dto.TokenDto;
 import hyundai.softeer.orange.eventuser.dto.RequestAuthCodeDto;
 import hyundai.softeer.orange.eventuser.dto.RequestUserDto;
 import hyundai.softeer.orange.eventuser.service.EventUserService;
+import hyundai.softeer.orange.eventuser.service.SmsService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class EventUserController {
 
     private final EventUserService eventUserService;
+    private final SmsService smsService;
 
     // 로그인
     @Tag(name = "EventUser")
@@ -43,7 +45,7 @@ public class EventUserController {
             @ApiResponse(responseCode = "400", description = "입력받은 정보의 유효성 검사가 실패했을 때")
     })
     public ResponseEntity<Void> sendAuthCode(@RequestBody @Valid RequestUserDto dto) {
-        eventUserService.sendAuthCode(dto);
+        smsService.sendSms(dto);
         return ResponseEntity.ok().build();
     }
 
