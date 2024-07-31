@@ -3,11 +3,13 @@ package hyundai.softeer.orange.core.auth;
 import hyundai.softeer.orange.core.jwt.JWTManager;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import java.util.*;
 
+@Component // 문제 있으면 변경
 public class AuthInterceptor implements HandlerInterceptor {
     private final JWTManager jwtManager;
 

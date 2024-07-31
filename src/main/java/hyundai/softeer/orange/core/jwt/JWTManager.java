@@ -18,8 +18,8 @@ public class JWTManager {
     private SecretKey secretKey;
 
     // jwt.secret을 properties에 넣어야 함!
-    @Autowired
-    public void setSecretKey(@Value("{jwt.secret}") String secretKey) {
+    @Value("${jwt.secret}")
+    public void setSecretKey(String secretKey) {
         this.secretKey = getDecodedSecretKey(secretKey);
     }
 
