@@ -1,11 +1,17 @@
 package hyundai.softeer.orange.admin.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Table(name="admin_user")
 @Getter
 @Entity
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class Admin {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
