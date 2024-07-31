@@ -4,6 +4,7 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 class AuthNameUtilTest {
@@ -16,7 +17,7 @@ class AuthNameUtilTest {
 
         String actual = AuthNameUtil.authName(defaultName);
 
-        Assertions.assertThat(actual).isEqualTo(expected);
+        assertThat(actual).isEqualTo(expected);
     }
 
     @DisplayName("클래스를 넘기면 클래스 이름에 prefix 붙여서 반환")
@@ -26,6 +27,6 @@ class AuthNameUtilTest {
 
         String actual = AuthNameUtil.authName(AuthNameUtil.class);
 
-        Assertions.assertThat(actual).isEqualTo(expected);
+        assertThat(actual).isEqualTo(expected);
     }
 }
