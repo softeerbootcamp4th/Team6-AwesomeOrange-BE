@@ -25,13 +25,7 @@ public class AdminController {
 
     @PostMapping("/auth/signup")
     public ResponseEntity<Object> signUp(@Valid @RequestBody AdminSignupRequest dto) {
-        try {
             adminAuthService.signUp(dto.getUsername(), dto.getPassword(), dto.getNickname());
             return ResponseEntity.status(HttpStatus.CREATED).build();
-        } catch (Exception e) {
-            // user already exist
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
-        }
-
     }
 }
