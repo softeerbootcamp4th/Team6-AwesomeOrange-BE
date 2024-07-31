@@ -6,5 +6,5 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface Auth {
-    Class<?>[] value() default {};
+    AuthRole[] value() default {};
 }

@@ -1,9 +1,9 @@
 package hyundai.softeer.orange.core.jwt;
 
+import hyundai.softeer.orange.core.auth.AuthRole;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.jackson.io.JacksonDeserializer;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -25,21 +25,25 @@ public class JWTManager {
 
     /**
      * jwt 토큰을 생성한다. 수명은 기본적으로 시간(HOUR) 단위로 정해진다.
-     * @param subject 토큰의 목적
-     * @param claims 토큰에 담을 객체를 Map 형태로 정의한 것
+     *
+     * @param subject  토큰의 목적
+     * @param claims   토큰에 담을 객체를 Map 형태로 정의한 것
      * @param lifeSpan 토큰의 수명. 단위는 시간(HOUR)
      * @return JWT 토큰 문자열
      */
     public String generateToken(String subject, Map<String, Object> claims, int lifeSpan) {
-        return generateToken(subject,claims,lifeSpan,Calendar.HOUR);
+        return generateToken(subject, claims, lifeSpan, Calendar.HOUR);
     }
 
     /**
      * jwt 토큰을 생성한다.
-     * @param subject 토큰의 목적
-     * @param claims 토큰에 담을 객체를 Map 형태로 정의한 것
-     * @param lifeSpan 토큰의 수명. 단위는 calanderType으로 정의한다.
+     *
+     * @param subject      토큰의 목적
+     * @param claims       토큰에 담을 객체를 Map 형태로 정의한 것
+     * @param lifeSpan     토큰의 수명.
+     * @param calendarType 시간 타입. Calendar 클래스 이하에 정의된 상수.
      * @return JWT 토큰 문자열
+     *
      */
     public String generateToken(String subject, Map<String, Object> claims, int lifeSpan, int calendarType) {
         // 시작 시간 설정
@@ -63,7 +67,7 @@ public class JWTManager {
                 .expiration(expirationDate)
                 .subject(subject);
 
-        for(Map.Entry<String, Object> claim : claims.entrySet()) {
+        for (Map.Entry<String, Object> claim : claims.entrySet()) {
             builder.claim(claim.getKey(), claim.getValue());
         }
 
@@ -77,7 +81,7 @@ public class JWTManager {
     public Jws<Claims> parseToken(String token, Map<String, Class<?>> typeMap) {
         JwtParserBuilder parser = Jwts.parser()
                 .verifyWith(secretKey);
-        if(typeMap != null) {
+        if (typeMap != null) {
             parser.json(new JacksonDeserializer<>(typeMap));
         }
 
