@@ -1,7 +1,9 @@
 package hyundai.softeer.orange.core.security;
 
+import hyundai.softeer.orange.common.exception.InternalServerException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpServerErrorException;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -29,14 +31,17 @@ public class PasswordManagerDefaultImpl implements PasswordManager {
             return Base64.getEncoder().encodeToString(md.digest());
         } catch (NoSuchAlgorithmException e) {
             log.error(e.getMessage());
-            throw new RuntimeException(e);
+            throw new InternalServerException();
         }
     }
 
     @Override
     public boolean verify(String password, String encryptedPassword) {
         String[] beforePasswordInfo = encryptedPassword.split(SEPARATOR);
-        if(beforePasswordInfo.length != 2) throw new RuntimeException("맞는 비밀번호 규격이 아님");
+        if(beforePasswordInfo.length != 2) {
+            log.error("서버 측 비밀번호 규격이 호환되지 않습니다. 저장된 비밀번호가 현재 시스템과 일치하는지 확인하세요.");
+            throw new InternalServerException();
+        }
         String saltedPassword = beforePasswordInfo[0];
         String salt = beforePasswordInfo[1];
 

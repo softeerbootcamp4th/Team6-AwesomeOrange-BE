@@ -17,11 +17,11 @@ public class AdminArgumentResolver implements HandlerMethodArgumentResolver {
         return hasAnnotation && hasType;
     }
 
-
+    // @Auth에 등록한 클래스라면 아래 코드 정도로 값을 가져올 수 있음
     @Override
     public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
         HttpServletRequest request = (HttpServletRequest) webRequest.getNativeRequest();
 
-        return request.getSession().getAttribute(AuthNameUtil.authName(Admin.class));
+        return request.getAttribute(AuthNameUtil.authName(Admin.class));
     }
 }

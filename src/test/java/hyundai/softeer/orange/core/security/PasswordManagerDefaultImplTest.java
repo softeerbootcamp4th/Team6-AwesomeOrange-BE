@@ -4,6 +4,8 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 class PasswordManagerDefaultImplTest {
     PasswordManagerDefaultImpl pm = new PasswordManagerDefaultImpl();
 
@@ -16,7 +18,7 @@ class PasswordManagerDefaultImplTest {
         String[] passwordAndSalt = encryptedPassword.split("@");
 
         boolean isPasswordMatch = pm.verify(password2, encryptedPassword);
-        Assertions.assertThat(isPasswordMatch).isEqualTo(true);
+        assertThat(isPasswordMatch).isEqualTo(true);
     }
 
     @DisplayName("잘못된 비밀번호를 넣으면 해독 안됨")
@@ -28,6 +30,6 @@ class PasswordManagerDefaultImplTest {
 
         boolean isPasswordMatch = pm.verify(password2, encryptedPassword);
 
-        Assertions.assertThat(isPasswordMatch).isEqualTo(false);
+        assertThat(isPasswordMatch).isEqualTo(false);
     }
 }

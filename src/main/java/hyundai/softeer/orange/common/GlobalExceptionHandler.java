@@ -1,5 +1,6 @@
 package hyundai.softeer.orange.common;
 
+import hyundai.softeer.orange.admin.exception.AdminException;
 import hyundai.softeer.orange.comment.exception.CommentException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,8 +28,8 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(errors);
     }
 
-    @ExceptionHandler(CommentException.class)
-    public ResponseEntity<ErrorResponse> handleCommentException(CommentException e) {
+    @ExceptionHandler({CommentException.class, AdminException.class})
+    public ResponseEntity<ErrorResponse> handleCommentException(BaseException e) {
         return ResponseEntity.status(e.getErrorCode().getHttpStatus()).body(ErrorResponse.from(e.getErrorCode()));
     }
 }

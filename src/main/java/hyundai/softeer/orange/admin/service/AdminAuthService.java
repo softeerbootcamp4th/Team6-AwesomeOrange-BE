@@ -1,7 +1,9 @@
 package hyundai.softeer.orange.admin.service;
 
 import hyundai.softeer.orange.admin.entity.Admin;
+import hyundai.softeer.orange.admin.exception.AdminException;
 import hyundai.softeer.orange.admin.repository.AdminRepository;
+import hyundai.softeer.orange.common.ErrorCode;
 import hyundai.softeer.orange.core.jwt.JWTManager;
 import hyundai.softeer.orange.core.security.PasswordManager;
 import lombok.RequiredArgsConstructor;
@@ -25,12 +27,12 @@ public class AdminAuthService {
      */
     public String signIn(String username, String password) {
         Optional<Admin> adminOptional = adminRepository.findFirstByUsername(username);
-        if(adminOptional.isEmpty()) throw new RuntimeException("로그인 실패");
+        if(adminOptional.isEmpty()) throw new AdminException(ErrorCode.AUTHENTICATION_FAILED);
 
         Admin admin = adminOptional.get();
         String beforePassword = admin.getPassword();
         boolean loginSuccess = pwManager.verify(password, beforePassword);
-        if(!loginSuccess) throw new RuntimeException("로그인 실패");
+        if(!loginSuccess) throw new AdminException(ErrorCode.AUTHENTICATION_FAILED);
 
         // dto를 넣도록 수정하기.
         return jwtManager.generateToken("admin", Map.of("admin", admin), 5);
@@ -44,7 +46,7 @@ public class AdminAuthService {
      */
     public void signUp(String username, String password, String nickname) {
         boolean exists = adminRepository.existsByUsername(username);
-        if(exists) throw new RuntimeException("이미 존재하는 어드민 유저");
+        if(exists) throw new AdminException(ErrorCode.ADMIN_USER_ALREADY_EXISTS);
 
         String encryptedPassword = pwManager.encrypt(password);
 
