@@ -126,7 +126,7 @@ class EventUserControllerTest {
     @Test
     void checkAuthCodeTest() throws Exception {
         // given
-        RequestAuthCodeDto requestAuthCodeDto = new RequestAuthCodeDto("name", "01000000000", "123456");
+        RequestAuthCodeDto requestAuthCodeDto = new RequestAuthCodeDto("name", "01000000000", "123456", 1L);
         String requestBody = mapper.writeValueAsString(requestAuthCodeDto);
         String responseBody = mapper.writeValueAsString(tokenDto);
         when(eventUserService.checkAuthCode(any(RequestAuthCodeDto.class))).thenReturn(tokenDto);
@@ -144,7 +144,7 @@ class EventUserControllerTest {
     @ValueSource(strings = {"", " ", "   ", "1234a", "1234a6", "1234567"})
     void checkAuthCode400Test(String code) throws Exception {
         // given
-        RequestAuthCodeDto requestAuthCodeDto = new RequestAuthCodeDto("name", "01000000000", code);
+        RequestAuthCodeDto requestAuthCodeDto = new RequestAuthCodeDto("name", "01000000000", code, 1L);
         String requestBody = mapper.writeValueAsString(requestAuthCodeDto);
         Map<String, String> expectedErrors = new HashMap<>();
         expectedErrors.put("authCode", MessageUtil.INVALID_AUTH_CODE);
@@ -163,7 +163,7 @@ class EventUserControllerTest {
     @Test
     void checkAuthCode401Test() throws Exception {
         // given
-        RequestAuthCodeDto requestAuthCodeDto = new RequestAuthCodeDto("name", "01000000000", "123456");
+        RequestAuthCodeDto requestAuthCodeDto = new RequestAuthCodeDto("name", "01000000000", "123456", 1L);
         String requestBody = mapper.writeValueAsString(requestAuthCodeDto);
         String responseBody = mapper.writeValueAsString(ErrorResponse.from(ErrorCode.INVALID_AUTH_CODE));
         when(eventUserService.checkAuthCode(any(RequestAuthCodeDto.class))).thenThrow(new EventUserException(ErrorCode.INVALID_AUTH_CODE));
