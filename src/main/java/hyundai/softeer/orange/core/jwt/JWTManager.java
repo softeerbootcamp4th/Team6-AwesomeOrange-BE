@@ -1,6 +1,5 @@
 package hyundai.softeer.orange.core.jwt;
 
-import hyundai.softeer.orange.core.auth.AuthRole;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.jackson.io.JacksonDeserializer;
 import io.jsonwebtoken.security.Keys;
