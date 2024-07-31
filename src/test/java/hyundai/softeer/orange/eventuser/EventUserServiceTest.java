@@ -1,10 +1,10 @@
 package hyundai.softeer.orange.eventuser;
 
 import hyundai.softeer.orange.common.ErrorCode;
+import hyundai.softeer.orange.common.dto.TokenDto;
 import hyundai.softeer.orange.event.common.entity.EventFrame;
 import hyundai.softeer.orange.eventuser.dto.RequestAuthCodeDto;
 import hyundai.softeer.orange.eventuser.dto.RequestUserDto;
-import hyundai.softeer.orange.eventuser.dto.ResponseJwtDto;
 import hyundai.softeer.orange.eventuser.entity.EventUser;
 import hyundai.softeer.orange.eventuser.exception.EventUserException;
 import hyundai.softeer.orange.eventuser.repository.EventUserRepository;
@@ -43,9 +43,9 @@ class EventUserServiceTest {
             .name("test")
             .phoneNumber("01012345678")
             .build();
-    ResponseJwtDto responseJwtDto = new ResponseJwtDto("access", "refresh");
+    TokenDto tokenDto = new TokenDto("token");
     EventFrame eventFrame = EventFrame.of("eventFrame");
-    EventUser eventUser = EventUser.of("test", "01000000000", eventFrame);
+    EventUser eventUser = EventUser.of("test", "01000000000", eventFrame, "uuid");
 
     @DisplayName("login: 유저가 로그인한다.")
     @Test
@@ -55,12 +55,10 @@ class EventUserServiceTest {
                 .willReturn(Optional.of(eventUser));
 
         // when
-        ResponseJwtDto result = eventUserService.login(requestUserDto);
+        TokenDto result = eventUserService.login(requestUserDto);
 
         // then
         assertThat(result).isNotNull();
-        assertThat(result.getAccessToken()).isEqualTo(responseJwtDto.getAccessToken());
-        assertThat(result.getRefreshToken()).isEqualTo(responseJwtDto.getRefreshToken());
     }
 
     @DisplayName("login: 유저가 로그인 시 유저를 찾을 수 없어 예외가 발생한다.")
@@ -98,7 +96,7 @@ class EventUserServiceTest {
                 .build();
 
         // when
-        ResponseJwtDto result = eventUserService.checkAuthCode(requestAuthCodeDto);
+        TokenDto result = eventUserService.checkAuthCode(requestAuthCodeDto);
 
         // then
         assertThat(result).isNotNull();

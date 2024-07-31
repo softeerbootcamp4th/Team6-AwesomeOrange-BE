@@ -3,11 +3,12 @@ package hyundai.softeer.orange.eventuser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hyundai.softeer.orange.common.ErrorCode;
 import hyundai.softeer.orange.common.ErrorResponse;
+import hyundai.softeer.orange.common.dto.TokenDto;
 import hyundai.softeer.orange.common.util.MessageUtil;
+import hyundai.softeer.orange.core.jwt.JWTManager;
 import hyundai.softeer.orange.eventuser.controller.EventUserController;
 import hyundai.softeer.orange.eventuser.dto.RequestAuthCodeDto;
 import hyundai.softeer.orange.eventuser.dto.RequestUserDto;
-import hyundai.softeer.orange.eventuser.dto.ResponseJwtDto;
 import hyundai.softeer.orange.eventuser.exception.EventUserException;
 import hyundai.softeer.orange.eventuser.service.EventUserService;
 import org.junit.jupiter.api.DisplayName;
@@ -44,9 +45,12 @@ class EventUserControllerTest {
     @MockBean
     private EventUserService eventUserService;
 
+    @MockBean
+    private JWTManager jwtManager;
+
     ObjectMapper mapper = new ObjectMapper();
     RequestUserDto requestUserDto = new RequestUserDto("hyundai", "01000000000");
-    ResponseJwtDto responseJwtDto = new ResponseJwtDto("access", "refresh");
+    TokenDto tokenDto = new TokenDto("token");
 
     @DisplayName("login: 로그인 API를 호출한다.")
     @ParameterizedTest(name = "name: {0}, phoneNumber: {1}")
@@ -59,8 +63,8 @@ class EventUserControllerTest {
         // given
         requestUserDto = new RequestUserDto(name, phoneNumber);
         String requestBody = mapper.writeValueAsString(requestUserDto);
-        String responseBody = mapper.writeValueAsString(responseJwtDto);
-        when(eventUserService.login(any(RequestUserDto.class))).thenReturn(responseJwtDto);
+        String responseBody = mapper.writeValueAsString(tokenDto);
+        when(eventUserService.login(any(RequestUserDto.class))).thenReturn(tokenDto);
 
         // when & then
         mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/event-user/login")
@@ -124,8 +128,8 @@ class EventUserControllerTest {
         // given
         RequestAuthCodeDto requestAuthCodeDto = new RequestAuthCodeDto("name", "01000000000", "123456");
         String requestBody = mapper.writeValueAsString(requestAuthCodeDto);
-        String responseBody = mapper.writeValueAsString(responseJwtDto);
-        when(eventUserService.checkAuthCode(any(RequestAuthCodeDto.class))).thenReturn(responseJwtDto);
+        String responseBody = mapper.writeValueAsString(tokenDto);
+        when(eventUserService.checkAuthCode(any(RequestAuthCodeDto.class))).thenReturn(tokenDto);
 
         // when & then
         mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/event-user/check-auth")

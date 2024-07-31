@@ -1,8 +1,8 @@
 package hyundai.softeer.orange.eventuser.controller;
 
+import hyundai.softeer.orange.common.dto.TokenDto;
 import hyundai.softeer.orange.eventuser.dto.RequestAuthCodeDto;
 import hyundai.softeer.orange.eventuser.dto.RequestUserDto;
-import hyundai.softeer.orange.eventuser.dto.ResponseJwtDto;
 import hyundai.softeer.orange.eventuser.service.EventUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -31,7 +31,7 @@ public class EventUserController {
             @ApiResponse(responseCode = "400", description = "입력받은 정보의 유효성 검사가 실패했을 때"),
             @ApiResponse(responseCode = "404", description = "해당 정보를 갖는 유저가 존재하지 않을 때")
     })
-    public ResponseEntity<ResponseJwtDto> login(@RequestBody @Valid RequestUserDto dto) {
+    public ResponseEntity<TokenDto> login(@RequestBody @Valid RequestUserDto dto) {
         return ResponseEntity.ok(eventUserService.login(dto));
     }
 
@@ -55,7 +55,7 @@ public class EventUserController {
             @ApiResponse(responseCode = "400", description = "입력받은 정보의 유효성 검사가 실패했을 때"),
             @ApiResponse(responseCode = "401", description = "인증번호가 일치하지 않을 때")
     })
-    public ResponseEntity<ResponseJwtDto> checkAuthCode(@RequestBody @Valid RequestAuthCodeDto dto) {
+    public ResponseEntity<TokenDto> checkAuthCode(@RequestBody @Valid RequestAuthCodeDto dto) {
         return ResponseEntity.ok(eventUserService.checkAuthCode(dto));
     }
 }
