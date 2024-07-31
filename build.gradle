@@ -42,6 +42,12 @@ dependencies {
 	// redis
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 	implementation 'org.springframework.data:spring-data-redis'
+
+	// valid
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+	// mockito
+	testImplementation 'org.mockito:mockito-core:3.12.4'
 }
 
 tasks.named('test') {

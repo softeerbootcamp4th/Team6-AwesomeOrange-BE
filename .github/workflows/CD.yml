@@ -25,7 +25,10 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
-      - name: Remove Docker Container
+      - name: Pull Docker Image
+        run: sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/orange
+
+      - name: Remove Old Docker Container
         run: sudo docker rm -f orange || true
 
       - name: Run Updated Docker Container
