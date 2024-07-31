@@ -1,4 +1,4 @@
-package hyundai.softeer.orange.core;
+package hyundai.softeer.orange.config;
 
 import hyundai.softeer.orange.admin.component.AdminArgumentResolver;
 import hyundai.softeer.orange.core.auth.AuthInterceptor;
