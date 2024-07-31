@@ -10,6 +10,7 @@ import hyundai.softeer.orange.eventuser.controller.EventUserController;
 import hyundai.softeer.orange.eventuser.dto.RequestAuthCodeDto;
 import hyundai.softeer.orange.eventuser.dto.RequestUserDto;
 import hyundai.softeer.orange.eventuser.exception.EventUserException;
+import hyundai.softeer.orange.eventuser.service.CoolSmsService;
 import hyundai.softeer.orange.eventuser.service.EventUserService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -44,6 +45,9 @@ class EventUserControllerTest {
 
     @MockBean
     private EventUserService eventUserService;
+
+    @MockBean
+    private CoolSmsService smsService;
 
     @MockBean
     private JWTManager jwtManager;
@@ -113,7 +117,7 @@ class EventUserControllerTest {
     void sendAuthCodeTest() throws Exception {
         // given
         String requestBody = mapper.writeValueAsString(requestUserDto);
-        doNothing().when(eventUserService).sendAuthCode(requestUserDto);
+        doNothing().when(smsService).sendSms(any(RequestUserDto.class));
 
         // when & then
         mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/event-user/send-auth")

@@ -91,19 +91,6 @@ class EventUserServiceTest {
                 .hasMessage(ErrorCode.EVENT_USER_NOT_FOUND.getMessage());
     }
 
-    @DisplayName("sendAuthCode: 유저에게 외부 API를 통해 인증번호를 전송하고, Redis에 유저의 전화번호-인증번호를 저장한다.")
-    @Test
-    void sendAuthCodeTest() {
-        // given
-        given(stringRedisTemplate.opsForValue().get(requestUserDto.getPhoneNumber())).willReturn("123456");
-
-
-        // when
-
-
-        // then
-    }
-
     @DisplayName("checkAuthCode: 유저가 전송한 인증번호를 Redis 상에서 확인하고 성공한다.")
     @ParameterizedTest
     @ValueSource(strings = {"123456", "654321", "111111", "921345"})
