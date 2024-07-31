@@ -109,7 +109,7 @@ class EventUserControllerTest {
     void sendAuthCodeTest() throws Exception {
         // given
         String requestBody = mapper.writeValueAsString(requestUserDto);
-        doNothing().when(eventUserService).sendAuthCode(requestUserDto.getPhoneNumber());
+        doNothing().when(eventUserService).sendAuthCode(requestUserDto);
 
         // when & then
         mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/event-user/send-auth")

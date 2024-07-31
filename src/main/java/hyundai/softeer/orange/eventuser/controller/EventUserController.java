@@ -43,7 +43,7 @@ public class EventUserController {
             @ApiResponse(responseCode = "400", description = "입력받은 정보의 유효성 검사가 실패했을 때")
     })
     public ResponseEntity<Void> sendAuthCode(@RequestBody @Valid RequestUserDto dto) {
-        eventUserService.sendAuthCode(dto.getPhoneNumber());
+        eventUserService.sendAuthCode(dto);
         return ResponseEntity.ok().build();
     }
 
