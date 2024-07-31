@@ -1,5 +1,7 @@
 package hyundai.softeer.orange.core.auth;
 
+import hyundai.softeer.orange.common.BaseException;
+import hyundai.softeer.orange.common.ErrorCode;
 import hyundai.softeer.orange.core.jwt.JWTManager;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -40,12 +42,11 @@ public class AuthInterceptor implements HandlerInterceptor {
         String authorizationHeader = request.getHeader("Authorization");
 
         // 헤더가 없는 경우 => 인증 안됨
-        if(authorizationHeader == null) return false;
+        if(authorizationHeader == null) throw new AuthException(ErrorCode.UNAUTHORIZED);
         String[] tokenInfo = authorizationHeader.split("\\s+");
 
         // Bearer token 형식이 아님 => 인증 안됨
-        if (tokenInfo.length < 2) return false;
-        if(tokenInfo[0].equalsIgnoreCase("bearer")) return false;
+        if (tokenInfo.length < 2 || tokenInfo[0].equalsIgnoreCase("bearer")) throw new AuthException(ErrorCode.UNAUTHORIZED);
 
         String token = tokenInfo[1];
 
@@ -62,7 +63,7 @@ public class AuthInterceptor implements HandlerInterceptor {
             }
 
         } catch (Exception e) {
-            return false;
+            throw new AuthException(ErrorCode.UNAUTHORIZED);
         }
 
         return true;
