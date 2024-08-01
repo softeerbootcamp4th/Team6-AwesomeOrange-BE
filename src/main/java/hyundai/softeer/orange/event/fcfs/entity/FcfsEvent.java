@@ -33,5 +33,5 @@ public class FcfsEvent {
     private EventMetadata eventMetaData;
 
     @OneToMany(mappedBy = "fcfsEvent")
-    private List<FcfsEventWinningInfo> infos = new ArrayList<>();
+    private final List<FcfsEventWinningInfo> infos = new ArrayList<>();
 }

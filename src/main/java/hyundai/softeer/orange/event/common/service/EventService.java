@@ -10,6 +10,7 @@ import hyundai.softeer.orange.event.common.enums.EventType;
 import hyundai.softeer.orange.event.common.exception.EventException;
 import hyundai.softeer.orange.event.common.repository.EventFrameRepository;
 import hyundai.softeer.orange.event.common.repository.EventMetadataRepository;
+import hyundai.softeer.orange.event.component.EventKeyGenerator;
 import hyundai.softeer.orange.event.dto.EventDto;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,7 @@ public class EventService {
     private final EventFrameRepository efRepository;
     private final EventMetadataRepository emRepository;
     private final EventFieldMapperMatcher mapperMatcher;
+    private final EventKeyGenerator keyGenerator;
 
     @Transactional
     public void createEvent(EventDto eventDto) {
@@ -37,9 +39,11 @@ public class EventService {
         if (frameOpt.isEmpty()) throw new EventException(ErrorCode.EVENT_FRAME_NOT_FOUND);
 
         EventFrame frame = frameOpt.get();
+        String eventKey = keyGenerator.generate();
 
         // 2. 이벤트 메타데이터 객체를 생성한다.
         EventMetadata eventMetadata = EventMetadata.builder()
+                .eventId(eventKey)
                 .name(eventDto.getName())
                 .description(eventDto.getDescription())
                 .startTime(eventDto.getStartTime())
@@ -64,6 +68,4 @@ public class EventService {
         EventFrame eventFrame = EventFrame.of(name);
         efRepository.save(eventFrame);
     }
-
-
 }

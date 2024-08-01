@@ -37,6 +37,6 @@ public class FcfsEventFieldMapper implements EventFieldMapper {
                         .build()
         ).toList();
 
-        metadata.setFcfsEvents(fcfsEventList);
+        metadata.addFcfsEvents(fcfsEventList);
     }
 }

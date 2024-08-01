@@ -7,12 +7,14 @@ import hyundai.softeer.orange.event.fcfs.entity.FcfsEvent;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+@Getter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -52,17 +54,17 @@ public class EventMetadata {
     private EventFrame eventFrame;
 
     @OneToMany(mappedBy = "eventMetadata", cascade = {CascadeType.PERSIST})
-    private List<DrawEvent> drawEventList = new ArrayList<>();
+    private final List<DrawEvent> drawEventList = new ArrayList<>();
 
     public void addDrawEvent(DrawEvent drawEvent) {
         this.drawEventList.add(drawEvent);
     }
 
     @OneToMany(mappedBy = "eventMetaData", cascade = {CascadeType.PERSIST})
-    private List<FcfsEvent> fcfsEventList = new ArrayList<>();
+    private final List<FcfsEvent> fcfsEventList = new ArrayList<>();
 
-    public void setFcfsEvents(List<FcfsEvent> fcfsEventList) {
-        this.fcfsEventList = fcfsEventList;
+    public void addFcfsEvents(List<FcfsEvent> fcfsEventList) {
+        this.fcfsEventList.addAll(fcfsEventList);
     }
 
     public void addFcfsEvent(FcfsEvent fcfsEvent) {
