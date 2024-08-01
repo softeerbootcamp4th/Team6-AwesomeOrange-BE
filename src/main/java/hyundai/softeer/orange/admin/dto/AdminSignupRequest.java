@@ -6,11 +6,11 @@ import lombok.Getter;
 @Getter
 public class AdminSignupRequest {
     @NotBlank
-    private String username;
+    private String userName;
 
     @NotBlank
     private String password;
 
     @NotBlank
-    private String nickname;
+    private String nickName;
 }

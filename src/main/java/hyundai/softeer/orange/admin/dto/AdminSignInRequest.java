@@ -6,7 +6,7 @@ import lombok.Getter;
 @Getter
 public class AdminSignInRequest {
     @NotBlank
-    private String username;
+    private String userName;
 
     @NotBlank
     private String password;

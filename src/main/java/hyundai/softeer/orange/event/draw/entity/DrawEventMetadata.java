@@ -22,4 +22,13 @@ public class DrawEventMetadata {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "draw_event_id")
     private DrawEvent drawEvent;
+
+    public static DrawEventMetadata of(Long grade, Long count, String prizeInfo, DrawEvent drawEvent) {
+        DrawEventMetadata metadata = new DrawEventMetadata();
+        metadata.grade = grade;
+        metadata.count = count;
+        metadata.prizeInfo = prizeInfo;
+        metadata.drawEvent = drawEvent;
+        return metadata;
+    }
 }

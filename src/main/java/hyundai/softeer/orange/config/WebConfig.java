@@ -15,15 +15,16 @@ public class WebConfig implements WebMvcConfigurer {
     @Autowired
     private AuthInterceptor authInterceptor;
 
+    @Autowired
+    private AdminArgumentResolver adminArgumentResolver;
+
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(authInterceptor)
-                .addPathPatterns("/**")
-                .excludePathPatterns("/swagger-ui/**");
+        registry.addInterceptor(authInterceptor);
     }
 
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
-        resolvers.add(new AdminArgumentResolver());
+        resolvers.add(adminArgumentResolver);
     }
 }

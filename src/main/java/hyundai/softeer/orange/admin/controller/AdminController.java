@@ -18,14 +18,14 @@ public class AdminController {
 
     @PostMapping("/auth/signin")
     public TokenDto signIn(@Valid @RequestBody AdminSignInRequest dto) {
-        String userToken = adminAuthService.signIn(dto.getUsername(), dto.getPassword());
+        String userToken = adminAuthService.signIn(dto.getUserName(), dto.getPassword());
         return new TokenDto(userToken);
     }
 
 
     @PostMapping("/auth/signup")
     public ResponseEntity<Object> signUp(@Valid @RequestBody AdminSignupRequest dto) {
-            adminAuthService.signUp(dto.getUsername(), dto.getPassword(), dto.getNickname());
+            adminAuthService.signUp(dto.getUserName(), dto.getPassword(), dto.getNickName());
             return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }
