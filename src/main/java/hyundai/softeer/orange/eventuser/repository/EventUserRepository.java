@@ -10,4 +10,6 @@ import java.util.Optional;
 public interface EventUserRepository extends JpaRepository<EventUser, Long> {
 
     Optional<EventUser> findByUserNameAndPhoneNumber(String userName, String phoneNumber);
+
+    Optional<EventUser> findByUserId(String userId);
 }
