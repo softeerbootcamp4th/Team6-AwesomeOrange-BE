@@ -35,6 +35,12 @@ public class EventDto {
     @NotNull
     private EventType eventType;
 
+    /**
+     * 이벤트에 대한 태그 ex) 2024 현대 여름 이벤트
+     */
+    @NotNull
+    private String tag;
+
     @Valid
     private List<FcfsEventDto> fcfs;
 

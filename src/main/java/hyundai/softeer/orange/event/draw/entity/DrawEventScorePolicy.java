@@ -21,4 +21,12 @@ public class DrawEventScorePolicy {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "draw_event_id")
     private DrawEvent drawEvent;
+
+    public static DrawEventScorePolicy of(DrawEventAction action, Integer score, DrawEvent drawEvent) {
+        DrawEventScorePolicy policy = new DrawEventScorePolicy();
+        policy.action = action;
+        policy.score = score;
+        policy.drawEvent = drawEvent;
+        return policy;
+    }
 }
