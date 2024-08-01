@@ -28,7 +28,7 @@ public class AdminAuthService {
      * @return 관리자 유저의 JWT 토큰
      */
     public String signIn(String username, String password) {
-        Optional<Admin> adminOptional = adminRepository.findFirstByUsername(username);
+        Optional<Admin> adminOptional = adminRepository.findFirstByUserName(username);
         if(adminOptional.isEmpty()) throw new AdminException(ErrorCode.AUTHENTICATION_FAILED);
 
         Admin admin = adminOptional.get();
@@ -42,20 +42,20 @@ public class AdminAuthService {
 
     /**
      * 관리자 유저를 생성하는 메서드.
-     * @param username 관리자 ID
+     * @param userName 관리자 ID
      * @param password 관리자 비밀번호
      * @param nickname 관리자의 닉네임
      */
-    public void signUp(String username, String password, String nickname) {
-        boolean exists = adminRepository.existsByUsername(username);
+    public void signUp(String userName, String password, String nickname) {
+        boolean exists = adminRepository.existsByUserName(userName);
         if(exists) throw new AdminException(ErrorCode.ADMIN_USER_ALREADY_EXISTS);
 
         String encryptedPassword = pwManager.encrypt(password);
 
         Admin admin = Admin.builder()
-                .username(username)
+                .userName(userName)
                 .password(encryptedPassword)
-                .nickname(nickname)
+                .nickName(nickname)
                 .build();
 
         adminRepository.save(admin);

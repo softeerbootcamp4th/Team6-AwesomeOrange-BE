@@ -21,13 +21,13 @@ public class Admin {
      * 어드민 유저가 로그인할 때 사용하는 아이디 정보
      */
     @Column
-    private String username;
+    private String userName;
 
     /**
      * 어드민 유저의 이름 ex) ~ 님 안녕하세요!
      */
     @Column
-    private String nickname;
+    private String nickName;
 
     @Column
     private String password;
