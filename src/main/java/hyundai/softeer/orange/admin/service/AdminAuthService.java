@@ -4,7 +4,6 @@ import hyundai.softeer.orange.admin.entity.Admin;
 import hyundai.softeer.orange.admin.exception.AdminException;
 import hyundai.softeer.orange.admin.repository.AdminRepository;
 import hyundai.softeer.orange.common.ErrorCode;
-import hyundai.softeer.orange.core.auth.AuthNameUtil;
 import hyundai.softeer.orange.core.auth.AuthRole;
 import hyundai.softeer.orange.core.jwt.JWTManager;
 import hyundai.softeer.orange.core.security.PasswordManager;

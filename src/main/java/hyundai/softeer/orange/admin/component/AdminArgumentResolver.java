@@ -2,7 +2,6 @@ package hyundai.softeer.orange.admin.component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hyundai.softeer.orange.admin.entity.Admin;
-import hyundai.softeer.orange.core.auth.AuthNameUtil;
 import hyundai.softeer.orange.core.jwt.JWTConst;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;

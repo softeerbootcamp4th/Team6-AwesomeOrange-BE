@@ -30,6 +30,7 @@ public class DrawEventFieldMapper implements EventFieldMapper {
         if (dto == null) throw new EventException(ErrorCode.INVALID_JSON);
 
         DrawEvent event = new DrawEvent();
+        metadata.addDrawEvent(event);
         event.setEventMetadata(metadata);
 
         List<DrawEventScorePolicy> policies = dto.getPolicies().stream().map(
