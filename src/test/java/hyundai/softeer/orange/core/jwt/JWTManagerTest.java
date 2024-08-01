@@ -29,7 +29,7 @@ class JWTManagerTest {
     void getSuccessfulToken() {
         String subject = "test";
         String claimKey = "testKey";
-        Admin admin = Admin.builder().nickname("testValue").build();
+        Admin admin = Admin.builder().nickName("testValue").build();
         int lifespan = 5;
 
         String token = jwtManager.generateToken(subject, Map.of(claimKey, admin), lifespan);
@@ -37,7 +37,7 @@ class JWTManagerTest {
 
         Admin parsedObj = tokenInfo.getPayload().get(claimKey, Admin.class);
 
-        assertThat(parsedObj.getNickname()).isEqualTo("testValue");
+        assertThat(parsedObj.getNickName()).isEqualTo("testValue");
         assertThat(tokenInfo.getPayload().getSubject()).isEqualTo(subject);
     }
 
@@ -66,7 +66,7 @@ class JWTManagerTest {
     void claims_throwExceptionIfTryToGetObjThatNotRegisteredToTypeMap() {
         String subject = "test";
         String claimKey = "testKey";
-        Admin admin = Admin.builder().nickname("testValue").build();
+        Admin admin = Admin.builder().nickName("testValue").build();
         int lifespan = 5;
 
         String token = jwtManager.generateToken(subject, Map.of(claimKey, admin), lifespan);

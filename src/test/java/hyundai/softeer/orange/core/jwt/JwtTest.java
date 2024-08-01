@@ -42,7 +42,7 @@ public class JwtTest {
                 .subject("admin")
                 .claim("user", Admin
                         .builder()
-                        .nickname("admin")
+                        .nickName("admin")
                         .password("test")
                         .build()
                 )
@@ -57,7 +57,7 @@ public class JwtTest {
         // 자체적으로 가진 JsonDeserializer 사용하든지, 아니면 ObjectMapper로 직접 역직렬화하라고 나옴
         Admin admin = obj.getPayload().get("user", Admin.class);
 
-        assertThat(admin.getNickname()).isEqualTo("admin");
+        assertThat(admin.getNickName()).isEqualTo("admin");
         assertThat(admin.getPassword()).isEqualTo("test");
         assertThat(sub).isEqualTo("admin");
     }

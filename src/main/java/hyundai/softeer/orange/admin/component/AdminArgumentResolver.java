@@ -18,7 +18,7 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 @Slf4j
 @Component
 public class AdminArgumentResolver implements HandlerMethodArgumentResolver {
-    private ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper;
 
     public AdminArgumentResolver(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;

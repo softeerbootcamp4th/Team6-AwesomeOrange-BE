@@ -62,7 +62,6 @@ public class AuthInterceptor implements HandlerInterceptor {
             if (!authRoleStringSet.contains(role)) throw new AuthException(ErrorCode.UNAUTHORIZED);
 
             request.setAttribute(JWTConst.Token, parsedToken);
-
         } catch (Exception e) {
             throw new AuthException(ErrorCode.UNAUTHORIZED);
         }
