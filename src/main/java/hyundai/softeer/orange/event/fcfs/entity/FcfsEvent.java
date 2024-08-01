@@ -33,7 +33,7 @@ public class FcfsEvent {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "event_metadata_id")
-    private EventMetadata eventMetadata;
+    private EventMetadata eventMetaData;
 
     @OneToMany(mappedBy = "fcfsEvent")
     private List<FcfsEventWinningInfo> infos = new ArrayList<>();

@@ -3,6 +3,7 @@ package hyundai.softeer.orange.event.common.entity;
 import hyundai.softeer.orange.event.common.enums.EventStatus;
 import hyundai.softeer.orange.event.common.enums.EventType;
 import hyundai.softeer.orange.event.draw.entity.DrawEvent;
+import hyundai.softeer.orange.event.fcfs.entity.FcfsEvent;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -43,4 +44,7 @@ public class EventMetadata {
 
     @OneToMany(mappedBy = "eventMetadata")
     private List<DrawEvent> drawEventList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "eventMetaData")
+    private List<FcfsEvent> fcfsEventList = new ArrayList<>();
 }
