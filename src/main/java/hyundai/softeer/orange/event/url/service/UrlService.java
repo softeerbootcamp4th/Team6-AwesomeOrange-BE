@@ -2,6 +2,7 @@ package hyundai.softeer.orange.event.url.service;
 
 import hyundai.softeer.orange.common.ErrorCode;
 import hyundai.softeer.orange.common.util.ConstantUtil;
+import hyundai.softeer.orange.event.url.dto.ResponseUrlDto;
 import hyundai.softeer.orange.event.url.entity.Url;
 import hyundai.softeer.orange.event.url.exception.UrlException;
 import hyundai.softeer.orange.event.url.repository.UrlRepository;
@@ -26,7 +27,7 @@ public class UrlService {
     private String baseUrl;
 
     @Transactional
-    public String generateUrl(String longUrl, String userId) {
+    public ResponseUrlDto generateUrl(String longUrl, String userId) {
         if(!UrlTypeValidation.valid(longUrl)){
             throw new UrlException(ErrorCode.INVALID_URL);
         }
@@ -39,7 +40,7 @@ public class UrlService {
         }
 
         Url url = Url.of(longUrl, baseUrl + shortUrl, eventUser);
-        return urlRepository.save(url).getShortUrl();
+        return new ResponseUrlDto(urlRepository.save(url).getShortUrl());
     }
 
     @Transactional(readOnly = true)
