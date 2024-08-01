@@ -31,23 +31,8 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(errors);
     }
 
-    @ExceptionHandler({CommentException.class, AdminException.class})
-    public ResponseEntity<ErrorResponse> handleCommentException(BaseException e) {
-        return ResponseEntity.status(e.getErrorCode().getHttpStatus()).body(ErrorResponse.from(e.getErrorCode()));
-    }
-
-    @ExceptionHandler(EventUserException.class)
-    public ResponseEntity<ErrorResponse> handleEventUserException(EventUserException e) {
-        return ResponseEntity.status(e.getErrorCode().getHttpStatus()).body(ErrorResponse.from(e.getErrorCode()));
-    }
-
-    @ExceptionHandler(FcfsEventException.class)
-    public ResponseEntity<ErrorResponse> handleFcfsEventException(FcfsEventException e) {
-        return ResponseEntity.status(e.getErrorCode().getHttpStatus()).body(ErrorResponse.from(e.getErrorCode()));
-    }
-
-    @ExceptionHandler(InternalServerException.class)
-    public ResponseEntity<ErrorResponse> handleInternalServerException(InternalServerException e) {
+    @ExceptionHandler({CommentException.class, AdminException.class, EventUserException.class, FcfsEventException.class, InternalServerException.class})
+    public ResponseEntity<ErrorResponse> handleException(BaseException e) {
         return ResponseEntity.status(e.getErrorCode().getHttpStatus()).body(ErrorResponse.from(e.getErrorCode()));
     }
 }
