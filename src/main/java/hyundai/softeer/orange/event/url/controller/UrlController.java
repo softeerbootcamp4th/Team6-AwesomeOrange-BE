@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "Url", description = "단축 URL 관련 API")
+@RequestMapping("/api/v1/url")
 @RequiredArgsConstructor
 @RestController
 public class UrlController {
@@ -21,7 +22,7 @@ public class UrlController {
     private final UrlService urlService;
 
     @Tag(name = "Url")
-    @PostMapping("/api/v1/url/shorten")
+    @PostMapping("/shorten")
     @Operation(summary = "URL 단축", description = "URL을 단축하여 반환합니다.", responses = {
             @ApiResponse(responseCode = "200", description = "URL 단축 성공",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = String.class))),
@@ -38,8 +39,7 @@ public class UrlController {
     @Tag(name = "Url")
     @GetMapping("/{shortUrl}")
     @Operation(summary = "URL 리다이렉트", description = "단축 URL을 원본 URL로 리다이렉트합니다.", responses = {
-            @ApiResponse(responseCode = "302", description = "URL 리다이렉트",
-                    content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "302", description = "URL 리다이렉트"),
             @ApiResponse(responseCode = "404", description = "단축 URL을 찾지 못했을 때",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })

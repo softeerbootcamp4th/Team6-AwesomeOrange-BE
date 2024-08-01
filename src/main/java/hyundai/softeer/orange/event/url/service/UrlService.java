@@ -23,9 +23,6 @@ public class UrlService {
     private final UrlRepository urlRepository;
     private final EventUserRepository eventUserRepository;
 
-    @Value("${base.url}")
-    private String baseUrl;
-
     @Transactional
     public ResponseUrlDto generateUrl(String longUrl, String userId) {
         if(!UrlTypeValidation.valid(longUrl)){
@@ -39,7 +36,7 @@ public class UrlService {
             shortUrl = generateShortUrl();
         }
 
-        Url url = Url.of(longUrl, baseUrl + shortUrl, eventUser);
+        Url url = Url.of(longUrl, shortUrl, eventUser);
         return new ResponseUrlDto(urlRepository.save(url).getShortUrl());
     }
 
