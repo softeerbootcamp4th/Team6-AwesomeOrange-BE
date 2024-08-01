@@ -24,18 +24,24 @@ public class RedisLockFcfsService implements FcfsService {
     @Override
     public boolean participate(Long eventSequence, String userId) {
         // time check
-        LocalDateTime startTime = (LocalDateTime) redissonClient.getBucket(FcfsUtil.startTimeFormatting(eventSequence.toString())).get();
-        if (LocalDateTime.now().isBefore(startTime)){
+        String startTime = stringRedisTemplate.opsForValue().get(FcfsUtil.startTimeFormatting(eventSequence.toString()));
+        if(startTime == null) {
+            throw new FcfsEventException(ErrorCode.FCFS_EVENT_NOT_FOUND);
+        }
+
+        if (LocalDateTime.now().isBefore(LocalDateTime.parse(startTime))){
             throw new FcfsEventException(ErrorCode.INVALID_EVENT_TIME);
         }
 
-        final String fcfsId = FcfsUtil.quantityKeyFormatting(eventSequence.toString());
-        if (isEventEnded(fcfsId)) { // 불필요한 Lock 접근을 막기 위한 flag 확인
-            log.info("{} 선착순 이벤트 마감", fcfsId);
+        final String fcfsId = FcfsUtil.keyFormatting(eventSequence.toString());
+
+        // 불필요한 Lock 접근을 막기 위한 종료 flag 확인
+        if (isEventEnded(fcfsId)) {
+            log.info("{} 선착순 이벤트 마감으로 참석 실패", userId);
             return false;
         }
 
-        final RLock lock = redissonClient.getLock(fcfsId);
+        final RLock lock = redissonClient.getLock("LOCK:" + fcfsId);
 
         try {
             boolean usingLock = lock.tryLock(1L, 3L, TimeUnit.SECONDS);
@@ -43,15 +49,16 @@ public class RedisLockFcfsService implements FcfsService {
                 return false;
             }
 
-            final long quantity = availableCoupons(fcfsId);
+            final int quantity = availableCoupons(fcfsId);
             if (quantity <= 0) {
+                log.info("{} - 쿠폰 소진으로 참석 실패", userId);
                 endEvent(fcfsId);  // 이벤트 종료 플래그 설정
                 return false;
             }
 
-            redissonClient.getBucket(fcfsId).set(quantity);
-            stringRedisTemplate.opsForList().rightPush(fcfsId, userId);
-            log.info("{} - 잔여 쿠폰: {}", Thread.currentThread().getName(), availableCoupons(fcfsId));
+            redissonClient.getBucket(fcfsId).set(quantity-1);
+            stringRedisTemplate.opsForSet().add(FcfsUtil.winnerFormatting(eventSequence.toString()), userId);
+            log.info("{} - 잔여 쿠폰: {}", userId, availableCoupons(fcfsId));
             return true;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();

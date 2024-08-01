@@ -17,4 +17,8 @@ public class FcfsUtil {
     public static String endFlagFormatting(String fcfsId) {
         return fcfsId + "_end";
     }
+
+    public static String winnerFormatting(String fcfsId) {
+        return fcfsId + "_winner";
+    }
 }

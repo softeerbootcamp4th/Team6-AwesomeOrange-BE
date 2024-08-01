@@ -36,7 +36,7 @@ public class FcfsManageService {
         List<FcfsEvent> events = fcfsEventRepository.findByStartTimeBetween(LocalDateTime.now(), LocalDateTime.now().plusDays(1));
         events.forEach(event -> {
             redissonClient.getBucket(FcfsUtil.keyFormatting(event.getId().toString())).set(event.getParticipantCount());
-            redissonClient.getBucket(FcfsUtil.startTimeFormatting(event.getId().toString())).set(event.getStartTime());
+            stringRedisTemplate.opsForValue().set(FcfsUtil.startTimeFormatting(event.getId().toString()), event.getStartTime().toString());
         });
     }
 
@@ -69,7 +69,8 @@ public class FcfsManageService {
                     .toList();
 
             fcfsEventWinningInfoRepository.saveAll(winningInfos);
-            stringRedisTemplate.delete(fcfsId);
+            redissonClient.getBucket(FcfsUtil.keyFormatting(eventId)).delete();
+            stringRedisTemplate.delete(FcfsUtil.startTimeFormatting(eventId));
         }
     }
 
