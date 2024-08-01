@@ -38,6 +38,7 @@ public enum ErrorCode {
     USER_ALREADY_EXISTS(HttpStatus.CONFLICT, false, "이미 존재하는 사용자입니다."),
     COMMENT_ALREADY_EXISTS(HttpStatus.CONFLICT, false, "이미 등록된 기대평입니다."),
     ADMIN_USER_ALREADY_EXISTS(HttpStatus.CONFLICT, false, "이미 존재하는 관리자입니다."),
+    ALREADY_PARTICIPATED(HttpStatus.CONFLICT, false, "이미 참여한 이벤트입니다."),
 
     // 500 Internal Server Error
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, false, "서버에 오류가 발생하였습니다.");

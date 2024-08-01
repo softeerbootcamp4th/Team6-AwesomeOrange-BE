@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class FcfsUtil {
 
-    public static String quantityKeyFormatting(String fcfsId) {
+    public static String keyFormatting(String fcfsId) {
         return fcfsId + ":fcfs";
     }
 

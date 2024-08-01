@@ -35,7 +35,7 @@ public class FcfsManageService {
     public void registerFcfsEvents() {
         List<FcfsEvent> events = fcfsEventRepository.findByStartTimeBetween(LocalDateTime.now(), LocalDateTime.now().plusDays(1));
         events.forEach(event -> {
-            redissonClient.getBucket(FcfsUtil.quantityKeyFormatting(event.getId().toString())).set(event.getParticipantCount());
+            redissonClient.getBucket(FcfsUtil.keyFormatting(event.getId().toString())).set(event.getParticipantCount());
             redissonClient.getBucket(FcfsUtil.startTimeFormatting(event.getId().toString())).set(event.getStartTime());
         });
     }
@@ -49,12 +49,13 @@ public class FcfsManageService {
         }
 
         for(String fcfsId : fcfsIds) {
-            List<String> userIds = stringRedisTemplate.opsForList().range(fcfsId, 0, -1);
+            String eventId = fcfsId.replace(":fcfs", "");
+            List<String> userIds = stringRedisTemplate.opsForList().range(eventId, 0, -1);
             if(userIds == null || userIds.isEmpty()) {
                 return;
             }
 
-            FcfsEvent event = fcfsEventRepository.findById(Long.parseLong(fcfsId))
+            FcfsEvent event = fcfsEventRepository.findById(Long.parseLong(eventId))
                     .orElseThrow(() -> new FcfsEventException(ErrorCode.FCFS_EVENT_NOT_FOUND));
 
             List<EventUser> users = eventUserRepository.findAllById(
