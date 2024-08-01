@@ -10,7 +10,6 @@ import hyundai.softeer.orange.event.url.util.UrlTypeValidation;
 import hyundai.softeer.orange.eventuser.entity.EventUser;
 import hyundai.softeer.orange.eventuser.repository.EventUserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,8 +23,8 @@ public class UrlService {
     private final EventUserRepository eventUserRepository;
 
     @Transactional
-    public ResponseUrlDto generateUrl(String longUrl, String userId) {
-        if(!UrlTypeValidation.valid(longUrl)){
+    public ResponseUrlDto generateUrl(String originalUrl, String userId) {
+        if(!UrlTypeValidation.valid(originalUrl)){
             throw new UrlException(ErrorCode.INVALID_URL);
         }
         EventUser eventUser = eventUserRepository.findByUserId(userId)
@@ -36,15 +35,15 @@ public class UrlService {
             shortUrl = generateShortUrl();
         }
 
-        Url url = Url.of(longUrl, shortUrl, eventUser);
+        Url url = Url.of(originalUrl, shortUrl, eventUser);
         return new ResponseUrlDto(urlRepository.save(url).getShortUrl());
     }
 
     @Transactional(readOnly = true)
-    public String getLongUrl(String url) {
+    public String getOriginalUrl(String url) {
         Url shortUrl = urlRepository.findByShortUrl(url)
                 .orElseThrow(() -> new UrlException(ErrorCode.SHORT_URL_NOT_FOUND));
-        return shortUrl.getLongUrl();
+        return shortUrl.getOriginalUrl();
     }
 
     private String generateShortUrl() {

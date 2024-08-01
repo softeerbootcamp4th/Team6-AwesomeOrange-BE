@@ -31,9 +31,9 @@ public class UrlController {
             @ApiResponse(responseCode = "404", description = "유저를 찾지 못했을 때",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
-    public ResponseEntity<ResponseUrlDto> urlShorten(@RequestParam String longUrl, @RequestParam String userId){
+    public ResponseEntity<ResponseUrlDto> urlShorten(@RequestParam String originalUrl, @RequestParam String userId){
         // TODO: JWT 토큰으로부터 userId를 추출하여 사용하도록 추후 수정
-        return ResponseEntity.ok(urlService.generateUrl(longUrl, userId));
+        return ResponseEntity.ok(urlService.generateUrl(originalUrl, userId));
     }
 
     @Tag(name = "Url")
@@ -45,7 +45,7 @@ public class UrlController {
     })
     public ResponseEntity<Void> redirectToOriginalUrl(@PathVariable String shortUrl){
         return ResponseEntity.status(302)
-                .header(ConstantUtil.LOCATION, urlService.getLongUrl(shortUrl))
+                .header(ConstantUtil.LOCATION, urlService.getOriginalUrl(shortUrl))
                 .build();
     }
 }

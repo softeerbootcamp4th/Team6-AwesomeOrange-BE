@@ -16,19 +16,19 @@ public class Url {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String shortUrl;
+    private String originalUrl;
 
-    private String longUrl;
+    private String shortUrl;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "event_user_id")
     private EventUser eventUser;
 
-    public static Url of(String longUrl, String url, EventUser eventUser) {
-        Url shortUrl = new Url();
-        shortUrl.longUrl = longUrl;
-        shortUrl.shortUrl = url;
-        shortUrl.eventUser = eventUser;
-        return shortUrl;
+    public static Url of(String originalUrl, String shortUrl, EventUser eventUser) {
+        Url url = new Url();
+        url.originalUrl = originalUrl;
+        url.shortUrl = shortUrl;
+        url.eventUser = eventUser;
+        return url;
     }
 }
