@@ -19,10 +19,10 @@ public class EventMetadata {
     @Column(unique = true)
     private String eventId;
 
-    @Column(length=80)
+    @Column(length=40)
     private String name;
 
-    @Column(length = 200)
+    @Column(length = 100)
     private String description;
 
     @Column
