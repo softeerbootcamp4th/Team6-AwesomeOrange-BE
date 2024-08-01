@@ -13,6 +13,7 @@ public enum ErrorCode {
     BAD_REQUEST(HttpStatus.BAD_REQUEST, false, "잘못된 요청입니다."),
     INVALID_COMMENT(HttpStatus.BAD_REQUEST, false, "부정적인 표현을 사용하였습니다."),
     INVALID_JSON(HttpStatus.BAD_REQUEST, false, "잘못된 JSON 형식입니다."),
+    INVALID_EVENT_TIME(HttpStatus.BAD_REQUEST, false, "이벤트 시간이 아닙니다."),
 
     // 401 Unauthorized
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, false, "인증되지 않은 사용자입니다."),
@@ -25,6 +26,7 @@ public enum ErrorCode {
 
     // 404 Not Found
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, false, "사용자를 찾을 수 없습니다."),
+    FCFS_EVENT_NOT_FOUND(HttpStatus.NOT_FOUND, false, "선착순 이벤트를 찾을 수 없습니다."),
     EVENT_FRAME_NOT_FOUND(HttpStatus.NOT_FOUND, false, "이벤트 프레임을 찾을 수 없습니다."),
     EVENT_USER_NOT_FOUND(HttpStatus.NOT_FOUND, false, "이벤트 사용자를 찾을 수 없습니다."),
     COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, false, "기대평을 찾을 수 없습니다."),
