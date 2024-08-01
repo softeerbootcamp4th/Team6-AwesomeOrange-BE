@@ -12,6 +12,7 @@ import hyundai.softeer.orange.comment.service.CommentService;
 import hyundai.softeer.orange.common.ErrorCode;
 import hyundai.softeer.orange.common.ErrorResponse;
 import hyundai.softeer.orange.common.util.MessageUtil;
+import hyundai.softeer.orange.core.jwt.JWTManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -46,6 +47,9 @@ class CommentControllerTest {
 
     @MockBean
     private ApiService apiService;
+
+    @MockBean
+    private JWTManager jwtManager;
 
     ObjectMapper mapper = new ObjectMapper();
     CreateCommentDto createCommentDto = new CreateCommentDto(1L, 1L, "hello");
