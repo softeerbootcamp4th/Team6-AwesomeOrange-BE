@@ -13,8 +13,11 @@ public class ConstantUtil {
     public static final String AUTH_CODE_REGEX = "\\d{6}"; // 6자리 숫자
     public static final String AUTH_CODE_CREATE_REGEX = "%06d";
     public static final String CLAIMS_KEY = "user";
+    public static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    public static final String LOCATION = "Location";
 
     public static final double LIMIT_NEGATIVE_CONFIDENCE = 99.5;
     public static final int COMMENTS_SIZE = 20;
     public static final int SCHEDULED_TIME = 1000 * 60 * 60 * 2;
+    public static final int SHORT_URL_LENGTH = 10;
 }

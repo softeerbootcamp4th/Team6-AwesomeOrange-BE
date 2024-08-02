@@ -13,6 +13,7 @@ public enum ErrorCode {
     BAD_REQUEST(HttpStatus.BAD_REQUEST, false, "잘못된 요청입니다."),
     INVALID_COMMENT(HttpStatus.BAD_REQUEST, false, "부정적인 표현을 사용하였습니다."),
     INVALID_JSON(HttpStatus.BAD_REQUEST, false, "잘못된 JSON 형식입니다."),
+    INVALID_URL(HttpStatus.BAD_REQUEST, false, "유효하지 않은 URL입니다."),
     INVALID_EVENT_TIME(HttpStatus.BAD_REQUEST, false, "이벤트 시간이 아닙니다."),
     INVALID_EVENT_TYPE(HttpStatus.BAD_REQUEST, false, "이벤트 타입이 지원되지 않습니다."),
 
@@ -28,6 +29,7 @@ public enum ErrorCode {
 
     // 404 Not Found
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, false, "사용자를 찾을 수 없습니다."),
+    SHORT_URL_NOT_FOUND(HttpStatus.NOT_FOUND, false, "단축 URL을 찾을 수 없습니다."),
     FCFS_EVENT_NOT_FOUND(HttpStatus.NOT_FOUND, false, "선착순 이벤트를 찾을 수 없습니다."),
     EVENT_FRAME_NOT_FOUND(HttpStatus.NOT_FOUND, false, "이벤트 프레임을 찾을 수 없습니다."),
     EVENT_USER_NOT_FOUND(HttpStatus.NOT_FOUND, false, "이벤트 사용자를 찾을 수 없습니다."),
@@ -38,6 +40,7 @@ public enum ErrorCode {
 
     // 409 Conflict
     USER_ALREADY_EXISTS(HttpStatus.CONFLICT, false, "이미 존재하는 사용자입니다."),
+    SHORT_URL_ALREADY_EXISTS(HttpStatus.CONFLICT, false, "이미 존재하는 URL입니다."),
     COMMENT_ALREADY_EXISTS(HttpStatus.CONFLICT, false, "이미 등록된 기대평입니다."),
     ADMIN_USER_ALREADY_EXISTS(HttpStatus.CONFLICT, false, "이미 존재하는 관리자입니다."),
 

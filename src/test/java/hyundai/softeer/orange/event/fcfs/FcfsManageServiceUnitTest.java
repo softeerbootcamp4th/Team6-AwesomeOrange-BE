@@ -2,6 +2,7 @@ package hyundai.softeer.orange.event.fcfs;
 
 import hyundai.softeer.orange.common.ErrorCode;
 import hyundai.softeer.orange.event.common.entity.EventFrame;
+import hyundai.softeer.orange.event.fcfs.dto.ResponseFcfsWinnerDto;
 import hyundai.softeer.orange.event.fcfs.entity.FcfsEvent;
 import hyundai.softeer.orange.event.fcfs.entity.FcfsEventWinningInfo;
 import hyundai.softeer.orange.event.fcfs.exception.FcfsEventException;
