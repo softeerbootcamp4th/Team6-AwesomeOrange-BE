@@ -25,9 +25,11 @@ public class UrlService {
             throw new UrlException(ErrorCode.INVALID_URL);
         }
 
-        String shortUrl = generateShortUrl(userId);
+        // originalUrl에 userId 추가
+        originalUrl += "?userId=" + userId;
+        String shortUrl = generateShortUrl();
         while(urlRepository.existsByShortUrl(shortUrl)){
-            shortUrl = generateShortUrl(userId);
+            shortUrl = generateShortUrl();
         }
 
         Url url = Url.of(originalUrl, shortUrl);
@@ -42,15 +44,13 @@ public class UrlService {
         return shortUrl.getOriginalUrl();
     }
 
-    private String generateShortUrl(String userId) {
+    private String generateShortUrl() {
         String characters = ConstantUtil.CHARACTERS;
         Random random = new Random();
         StringBuilder shortUrlsb = new StringBuilder(ConstantUtil.SHORT_URL_LENGTH);
         for (int i = 0; i < ConstantUtil.SHORT_URL_LENGTH; i++) {
             shortUrlsb.append(characters.charAt(random.nextInt(characters.length())));
         }
-        // QueryString으로 userId를 추가
-        shortUrlsb.append("?userId=").append(userId);
         return shortUrlsb.toString();
     }
 }
