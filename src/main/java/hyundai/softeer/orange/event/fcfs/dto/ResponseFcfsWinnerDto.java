@@ -1,4 +1,4 @@
-package hyundai.softeer.orange.event.fcfs;
+package hyundai.softeer.orange.event.fcfs.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
