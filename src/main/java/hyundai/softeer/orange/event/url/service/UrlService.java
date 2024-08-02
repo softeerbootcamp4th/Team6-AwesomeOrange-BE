@@ -38,10 +38,10 @@ public class UrlService {
     }
 
     @Transactional(readOnly = true)
-    public String getOriginalUrl(String url) {
-        Url shortUrl = urlRepository.findByShortUrl(url)
+    public String getOriginalUrl(String shortUrl) {
+        Url url = urlRepository.findByShortUrl(shortUrl)
                 .orElseThrow(() -> new UrlException(ErrorCode.SHORT_URL_NOT_FOUND));
-        return shortUrl.getOriginalUrl();
+        return url.getOriginalUrl().split("\\?")[0];
     }
 
     private String generateShortUrl() {
