@@ -40,7 +40,7 @@ public class UrlService {
     public String getOriginalUrl(String shortUrl) {
         Url url = urlRepository.findByShortUrl(shortUrl)
                 .orElseThrow(() -> new UrlException(ErrorCode.SHORT_URL_NOT_FOUND));
-        return url.getOriginalUrl().split("\\?")[0];
+        return url.getOriginalUrl();
     }
 
     private String generateShortUrl() {
