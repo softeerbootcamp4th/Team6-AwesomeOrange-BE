@@ -2,22 +2,20 @@ package hyundai.softeer.orange.event.url.util;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import org.springframework.stereotype.Component;
 
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URLConnection;
 
-@Component
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class UrlTypeValidation {
-    public static boolean valid(String url) {
+
+    public static boolean isValidURL(String url) {
         try {
-            URL connectionUrl = new URL(url);
-            URLConnection conn = connectionUrl.openConnection();
-            conn.connect();
-        } catch (Exception e) {
+            new URL(url).toURI();
+            return true;
+        } catch (MalformedURLException | URISyntaxException e) {
             return false;
         }
-        return true;
     }
 }

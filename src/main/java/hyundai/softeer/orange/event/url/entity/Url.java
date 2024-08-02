@@ -1,6 +1,5 @@
 package hyundai.softeer.orange.event.url.entity;
 
-import hyundai.softeer.orange.eventuser.entity.EventUser;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -20,15 +19,10 @@ public class Url {
 
     private String shortUrl;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "event_user_id")
-    private EventUser eventUser;
-
-    public static Url of(String originalUrl, String shortUrl, EventUser eventUser) {
+    public static Url of(String originalUrl, String shortUrl) {
         Url url = new Url();
         url.originalUrl = originalUrl;
         url.shortUrl = shortUrl;
-        url.eventUser = eventUser;
         return url;
     }
 }

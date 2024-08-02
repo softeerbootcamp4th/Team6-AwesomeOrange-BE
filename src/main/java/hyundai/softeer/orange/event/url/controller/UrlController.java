@@ -25,7 +25,7 @@ public class UrlController {
     @PostMapping("/shorten")
     @Operation(summary = "URL 단축", description = "URL을 단축하여 반환합니다.", responses = {
             @ApiResponse(responseCode = "200", description = "URL 단축 성공",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = String.class))),
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseUrlDto.class))),
             @ApiResponse(responseCode = "400", description = "URL 형식이 잘못되었을 때",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "404", description = "유저를 찾지 못했을 때",

@@ -7,8 +7,6 @@ import hyundai.softeer.orange.event.url.entity.Url;
 import hyundai.softeer.orange.event.url.exception.UrlException;
 import hyundai.softeer.orange.event.url.repository.UrlRepository;
 import hyundai.softeer.orange.event.url.util.UrlTypeValidation;
-import hyundai.softeer.orange.eventuser.entity.EventUser;
-import hyundai.softeer.orange.eventuser.repository.EventUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,23 +18,21 @@ import java.util.Random;
 public class UrlService {
 
     private final UrlRepository urlRepository;
-    private final EventUserRepository eventUserRepository;
 
     @Transactional
     public ResponseUrlDto generateUrl(String originalUrl, String userId) {
-        if(!UrlTypeValidation.valid(originalUrl)){
+        if(!UrlTypeValidation.isValidURL(originalUrl)){
             throw new UrlException(ErrorCode.INVALID_URL);
         }
-        EventUser eventUser = eventUserRepository.findByUserId(userId)
-                .orElseThrow(() -> new UrlException(ErrorCode.EVENT_USER_NOT_FOUND));
 
-        String shortUrl = generateShortUrl();
+        String shortUrl = generateShortUrl(userId);
         while(urlRepository.existsByShortUrl(shortUrl)){
-            shortUrl = generateShortUrl();
+            shortUrl = generateShortUrl(userId);
         }
 
-        Url url = Url.of(originalUrl, shortUrl, eventUser);
-        return new ResponseUrlDto(urlRepository.save(url).getShortUrl());
+        Url url = Url.of(originalUrl, shortUrl);
+        urlRepository.save(url);
+        return new ResponseUrlDto(shortUrl);
     }
 
     @Transactional(readOnly = true)
@@ -46,13 +42,15 @@ public class UrlService {
         return shortUrl.getOriginalUrl();
     }
 
-    private String generateShortUrl() {
+    private String generateShortUrl(String userId) {
         String characters = ConstantUtil.CHARACTERS;
         Random random = new Random();
         StringBuilder shortUrlsb = new StringBuilder(ConstantUtil.SHORT_URL_LENGTH);
         for (int i = 0; i < ConstantUtil.SHORT_URL_LENGTH; i++) {
             shortUrlsb.append(characters.charAt(random.nextInt(characters.length())));
         }
+        // QueryString으로 userId를 추가
+        shortUrlsb.append("?userId=").append(userId);
         return shortUrlsb.toString();
     }
 }
