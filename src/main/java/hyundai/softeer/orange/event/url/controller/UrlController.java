@@ -33,7 +33,7 @@ public class UrlController {
     })
     public ResponseEntity<ResponseUrlDto> urlShorten(@RequestParam String originalUrl, @RequestParam String userId){
         // TODO: JWT 토큰으로부터 userId를 추출하여 사용하도록 추후 수정
-        return ResponseEntity.ok(urlService.generateUrl(originalUrl, userId));
+        return ResponseEntity.ok(urlService.generateUrl(originalUrl));
     }
 
     @Tag(name = "Url")

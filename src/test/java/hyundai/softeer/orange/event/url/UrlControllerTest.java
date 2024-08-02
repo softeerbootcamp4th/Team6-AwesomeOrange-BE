@@ -45,7 +45,7 @@ class UrlControllerTest {
     @Test
     void urlShortenTest() throws Exception {
         // given
-        when(urlService.generateUrl(originalUrl, userId)).thenReturn(new ResponseUrlDto("shortUrl"));
+        when(urlService.generateUrl(originalUrl)).thenReturn(new ResponseUrlDto("shortUrl"));
         String responseBody = mapper.writeValueAsString(new ResponseUrlDto("shortUrl"));
 
         // when & then
@@ -61,7 +61,7 @@ class UrlControllerTest {
     @Test
     void urlShorten400Test() throws Exception {
         // given
-        when(urlService.generateUrl(originalUrl, userId)).thenThrow(new UrlException(ErrorCode.INVALID_URL));
+        when(urlService.generateUrl(originalUrl)).thenThrow(new UrlException(ErrorCode.INVALID_URL));
         String responseBody = mapper.writeValueAsString(ErrorResponse.from(ErrorCode.INVALID_URL));
 
         // when & then
@@ -77,7 +77,7 @@ class UrlControllerTest {
     @Test
     void urlShorten404Test() throws Exception {
         // given
-        when(urlService.generateUrl(originalUrl, userId)).thenThrow(new UrlException(ErrorCode.USER_NOT_FOUND));
+        when(urlService.generateUrl(originalUrl)).thenThrow(new UrlException(ErrorCode.USER_NOT_FOUND));
         String responseBody = mapper.writeValueAsString(ErrorResponse.from(ErrorCode.USER_NOT_FOUND));
 
         // when & then

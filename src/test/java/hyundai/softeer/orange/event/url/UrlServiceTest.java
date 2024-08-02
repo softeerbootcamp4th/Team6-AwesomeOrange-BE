@@ -45,7 +45,7 @@ class UrlServiceTest {
         given(urlRepository.existsByShortUrl(shortUrl)).willReturn(false);
 
         // when
-        ResponseUrlDto result = urlService.generateUrl(originalUrl, userId);
+        ResponseUrlDto result = urlService.generateUrl(originalUrl);
 
         // then
         assertThat(result.getShortUrl()).isNotNull();
@@ -57,7 +57,7 @@ class UrlServiceTest {
     @ValueSource(strings = {"", " ", "      ", "htppss://naver.com", "ww.naver.com", "navercom"})
     void generateUrlBadInputTest(String originalUrl) {
         // when & then
-        assertThatThrownBy(() -> urlService.generateUrl(originalUrl, userId))
+        assertThatThrownBy(() -> urlService.generateUrl(originalUrl))
                 .isInstanceOf(UrlException.class)
                 .hasMessage(ErrorCode.INVALID_URL.getMessage());
     }

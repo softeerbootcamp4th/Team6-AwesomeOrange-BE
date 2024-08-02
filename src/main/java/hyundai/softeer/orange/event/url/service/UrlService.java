@@ -20,13 +20,12 @@ public class UrlService {
     private final UrlRepository urlRepository;
 
     @Transactional
-    public ResponseUrlDto generateUrl(String originalUrl, String userId) {
+    public ResponseUrlDto generateUrl(String originalUrl) {
         if(!UrlTypeValidation.isValidURL(originalUrl)){
             throw new UrlException(ErrorCode.INVALID_URL);
         }
 
         // originalUrl에 userId 추가
-        originalUrl += "?userId=" + userId;
         String shortUrl = generateShortUrl();
         while(urlRepository.existsByShortUrl(shortUrl)){
             shortUrl = generateShortUrl();
