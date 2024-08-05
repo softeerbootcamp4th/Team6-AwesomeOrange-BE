@@ -2,11 +2,12 @@ package hyundai.softeer.orange.event.common.component.eventFieldMapper.mapper;
 
 import hyundai.softeer.orange.event.common.entity.EventMetadata;
 import hyundai.softeer.orange.event.common.enums.EventType;
-import hyundai.softeer.orange.event.draw.entity.DrawEvent;
+import hyundai.softeer.orange.event.draw.repository.DrawEventRepository;
 import hyundai.softeer.orange.event.dto.EventDto;
 import hyundai.softeer.orange.event.dto.draw.DrawEventDto;
 import hyundai.softeer.orange.event.dto.draw.DrawEventMetadataDto;
 import hyundai.softeer.orange.event.dto.draw.DrawEventScorePolicyDto;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -18,7 +19,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class DrawEventFieldMapperTest {
-    DrawEventFieldMapper mapper = new DrawEventFieldMapper();
+    DrawEventFieldMapper mapper;
+
+    @BeforeEach
+    void setUp() {
+        mapper = new DrawEventFieldMapper(null, null);
+    }
+
 
     @DisplayName("canHandle은 해당 타입을 지원하는지 여부를 반환한다.")
     @Test
@@ -37,7 +44,7 @@ class DrawEventFieldMapperTest {
         EventDto dto1 = new EventDto(); // drawDto 없음
 
         assertThatThrownBy(() -> {
-            mapper.handle(metadata, dto1);
+            mapper.fetchToEventEntity(metadata, dto1);
         });
     }
 
@@ -52,7 +59,7 @@ class DrawEventFieldMapperTest {
         when(drawEventDto.getMetadata()).thenReturn(List.of(new DrawEventMetadataDto()));
         when(drawEventDto.getPolicies()).thenReturn(List.of(new DrawEventScorePolicyDto()));
 
-        mapper.handle(metadata, dto);
+        mapper.fetchToEventEntity(metadata, dto);
 
         var drawEvents = metadata.getDrawEventList();
         var drawEvent = drawEvents.get(0);

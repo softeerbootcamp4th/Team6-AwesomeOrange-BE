@@ -5,20 +5,25 @@ import hyundai.softeer.orange.event.common.enums.EventType;
 import hyundai.softeer.orange.event.dto.EventDto;
 import hyundai.softeer.orange.event.dto.fcfs.FcfsEventDto;
 import hyundai.softeer.orange.event.fcfs.entity.FcfsEvent;
-import org.assertj.core.api.Assertions;
+import hyundai.softeer.orange.event.fcfs.repository.FcfsEventRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class FcfsEventFieldMapperTest {
-    FcfsEventFieldMapper mapper = new FcfsEventFieldMapper();
+
+    FcfsEventFieldMapper mapper;
+    @BeforeEach
+    void setUp() {
+        FcfsEventRepository repo = mock(FcfsEventRepository.class);
+        mapper = new FcfsEventFieldMapper(repo);
+    }
 
     @DisplayName("canHandle은 해당 타입을 지원하는지 여부를 반환한다.")
     @Test
@@ -39,11 +44,11 @@ class FcfsEventFieldMapperTest {
         when(dto2.getFcfs()).thenReturn(List.of());
 
         assertThatThrownBy(() -> {
-            mapper.handle(metadata, dto1);
+            mapper.fetchToEventEntity(metadata, dto1);
         });
 
         assertThatThrownBy(() -> {
-            mapper.handle(metadata, dto2);
+            mapper.fetchToEventEntity(metadata, dto2);
         });
     }
 
@@ -58,7 +63,7 @@ class FcfsEventFieldMapperTest {
         );
         when(dto.getFcfs()).thenReturn(dtos);
 
-        mapper.handle(metadata, dto);
+        mapper.fetchToEventEntity(metadata, dto);
 
         List<FcfsEvent> fcfsEvents = metadata.getFcfsEventList();
 
