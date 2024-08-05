@@ -23,6 +23,18 @@ public class DrawEventMetadata {
     @JoinColumn(name = "draw_event_id")
     private DrawEvent drawEvent;
 
+    public void updateGrade(Long grade) {
+        this.grade = grade;
+    }
+
+    public void updateCount(Long count) {
+        this.count = count;
+    }
+
+    public void updatePrizeInfo(String prizeInfo) {
+        this.prizeInfo = prizeInfo;
+    }
+
     public static DrawEventMetadata of(Long grade, Long count, String prizeInfo, DrawEvent drawEvent) {
         DrawEventMetadata metadata = new DrawEventMetadata();
         metadata.grade = grade;

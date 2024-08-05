@@ -3,14 +3,16 @@ package hyundai.softeer.orange.event.dto.draw;
 import hyundai.softeer.orange.event.dto.group.EventEditGroup;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
+import lombok.*;
 
 import java.util.List;
 
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Getter
+@Setter
 public class DrawEventDto {
-
-    @NotNull(groups = {EventEditGroup.class})
     private Long id;
 
     @NotNull

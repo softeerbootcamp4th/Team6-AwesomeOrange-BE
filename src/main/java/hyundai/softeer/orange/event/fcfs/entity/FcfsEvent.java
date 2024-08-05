@@ -38,6 +38,22 @@ public class FcfsEvent {
     @JoinColumn(name = "event_metadata_id")
     private EventMetadata eventMetaData;
 
+    public void updateStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public void updateEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
+    }
+
+    public void updateParticipantCount(Long participantCount) {
+        this.participantCount = participantCount;
+    }
+
+    public void updatePrizeInfo(String prizeInfo) {
+        this.prizeInfo = prizeInfo;
+    }
+
     @OneToMany(mappedBy = "fcfsEvent")
     private final List<FcfsEventWinningInfo> infos = new ArrayList<>();
 
