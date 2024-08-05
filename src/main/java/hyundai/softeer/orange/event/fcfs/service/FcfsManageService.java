@@ -52,7 +52,7 @@ public class FcfsManageService {
 
         for(String fcfsId : fcfsIds) {
             String eventId = fcfsId.replace(":fcfs", "");
-            List<String> userIds = stringRedisTemplate.opsForList().range(eventId, 0, -1);
+            Set<String> userIds = stringRedisTemplate.opsForZSet().range(FcfsUtil.winnerFormatting(eventId), 0, -1);
             if(userIds == null || userIds.isEmpty()) {
                 return;
             }
@@ -73,6 +73,7 @@ public class FcfsManageService {
             fcfsEventWinningInfoRepository.saveAll(winningInfos);
 
             stringRedisTemplate.delete(FcfsUtil.startTimeFormatting(event.getId().toString()));
+            stringRedisTemplate.delete(FcfsUtil.winnerFormatting(event.getId().toString()));
             numberRedisTemplate.delete(FcfsUtil.keyFormatting(eventId));
             booleanRedisTemplate.delete(FcfsUtil.endFlagFormatting(eventId));
         }
