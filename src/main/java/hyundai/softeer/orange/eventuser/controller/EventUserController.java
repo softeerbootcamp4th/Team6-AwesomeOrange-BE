@@ -11,10 +11,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "EventUser", description = "EventUser 관련 API")
 @RequiredArgsConstructor
@@ -51,13 +48,13 @@ public class EventUserController {
 
     // 인증번호 검증
     @Tag(name = "EventUser")
-    @PostMapping("/check-auth")
+    @PostMapping("/check-auth/{eventFrameId}")
     @Operation(summary = "인증번호 검증", description = "유저가 입력한 인증번호를 검증한다.", responses = {
             @ApiResponse(responseCode = "200", description = "인증번호 검증 성공"),
             @ApiResponse(responseCode = "400", description = "입력받은 정보의 유효성 검사가 실패했을 때"),
             @ApiResponse(responseCode = "401", description = "인증번호가 일치하지 않을 때")
     })
-    public ResponseEntity<TokenDto> checkAuthCode(@RequestBody @Valid RequestAuthCodeDto dto) {
-        return ResponseEntity.ok(eventUserService.checkAuthCode(dto));
+    public ResponseEntity<TokenDto> checkAuthCode(@PathVariable Long eventFrameId,  @RequestBody @Valid RequestAuthCodeDto dto) {
+        return ResponseEntity.ok(eventUserService.checkAuthCode(dto, eventFrameId));
     }
 }

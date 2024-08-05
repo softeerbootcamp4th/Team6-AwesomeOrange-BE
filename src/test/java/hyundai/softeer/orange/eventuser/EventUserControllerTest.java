@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -55,6 +56,7 @@ class EventUserControllerTest {
     ObjectMapper mapper = new ObjectMapper();
     RequestUserDto requestUserDto = new RequestUserDto("hyundai", "01000000000");
     TokenDto tokenDto = new TokenDto("token");
+    Long eventFrameId = 1L;
 
     @DisplayName("login: 로그인 API를 호출한다.")
     @ParameterizedTest(name = "name: {0}, phoneNumber: {1}")
@@ -130,13 +132,13 @@ class EventUserControllerTest {
     @Test
     void checkAuthCodeTest() throws Exception {
         // given
-        RequestAuthCodeDto requestAuthCodeDto = new RequestAuthCodeDto("name", "01000000000", "123456", 1L);
+        RequestAuthCodeDto requestAuthCodeDto = new RequestAuthCodeDto("name", "01000000000", "123456");
         String requestBody = mapper.writeValueAsString(requestAuthCodeDto);
         String responseBody = mapper.writeValueAsString(tokenDto);
-        when(eventUserService.checkAuthCode(any(RequestAuthCodeDto.class))).thenReturn(tokenDto);
+        when(eventUserService.checkAuthCode(any(RequestAuthCodeDto.class), anyLong())).thenReturn(tokenDto);
 
         // when & then
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/event-user/check-auth")
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/event-user/check-auth/" + eventFrameId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestBody))
                 .andExpect(status().isOk())
@@ -148,14 +150,14 @@ class EventUserControllerTest {
     @ValueSource(strings = {"", " ", "   ", "1234a", "1234a6", "1234567"})
     void checkAuthCode400Test(String code) throws Exception {
         // given
-        RequestAuthCodeDto requestAuthCodeDto = new RequestAuthCodeDto("name", "01000000000", code, 1L);
+        RequestAuthCodeDto requestAuthCodeDto = new RequestAuthCodeDto("name", "01000000000", code);
         String requestBody = mapper.writeValueAsString(requestAuthCodeDto);
         Map<String, String> expectedErrors = new HashMap<>();
         expectedErrors.put("authCode", MessageUtil.INVALID_AUTH_CODE);
         String responseBody = mapper.writeValueAsString(expectedErrors);
 
         // when & then
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/event-user/check-auth")
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/event-user/check-auth/" + eventFrameId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestBody))
                 .andExpect(status().isBadRequest())
@@ -167,13 +169,13 @@ class EventUserControllerTest {
     @Test
     void checkAuthCode401Test() throws Exception {
         // given
-        RequestAuthCodeDto requestAuthCodeDto = new RequestAuthCodeDto("name", "01000000000", "123456", 1L);
+        RequestAuthCodeDto requestAuthCodeDto = new RequestAuthCodeDto("name", "01000000000", "123456");
         String requestBody = mapper.writeValueAsString(requestAuthCodeDto);
         String responseBody = mapper.writeValueAsString(ErrorResponse.from(ErrorCode.INVALID_AUTH_CODE));
-        when(eventUserService.checkAuthCode(any(RequestAuthCodeDto.class))).thenThrow(new EventUserException(ErrorCode.INVALID_AUTH_CODE));
+        when(eventUserService.checkAuthCode(any(RequestAuthCodeDto.class), anyLong())).thenThrow(new EventUserException(ErrorCode.INVALID_AUTH_CODE));
 
         // when & then
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/event-user/check-auth")
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/event-user/check-auth/" + eventFrameId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestBody))
                 .andExpect(status().isUnauthorized())

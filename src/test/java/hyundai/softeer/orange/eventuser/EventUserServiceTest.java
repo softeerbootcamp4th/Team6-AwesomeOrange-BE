@@ -63,6 +63,7 @@ class EventUserServiceTest {
     TokenDto tokenDto = new TokenDto("token");
     EventFrame eventFrame = EventFrame.of("eventFrame");
     EventUser eventUser = EventUser.of("test", "01000000000", eventFrame, "uuid");
+    Long eventFrameId = 1L;
 
     @DisplayName("login: 유저가 로그인한다.")
     @Test
@@ -104,11 +105,10 @@ class EventUserServiceTest {
                 .name(eventUser.getUserName())
                 .phoneNumber(eventUser.getPhoneNumber())
                 .authCode(authCode)
-                .eventFrameId(1L)
                 .build();
 
         // when
-        TokenDto result = eventUserService.checkAuthCode(requestAuthCodeDto);
+        TokenDto result = eventUserService.checkAuthCode(requestAuthCodeDto, eventFrameId);
 
         // then
         assertThat(result.token()).isEqualTo(tokenDto.token());
@@ -131,7 +131,7 @@ class EventUserServiceTest {
                 .build();
 
         // when & then
-        assertThatThrownBy(() -> eventUserService.checkAuthCode(requestAuthCodeDto))
+        assertThatThrownBy(() -> eventUserService.checkAuthCode(requestAuthCodeDto, eventFrameId))
                 .isInstanceOf(EventUserException.class)
                 .hasMessage(ErrorCode.INVALID_AUTH_CODE.getMessage());
     }
@@ -147,7 +147,7 @@ class EventUserServiceTest {
                 .build();
 
         // when & then
-        assertThatThrownBy(() -> eventUserService.checkAuthCode(requestAuthCodeDto))
+        assertThatThrownBy(() -> eventUserService.checkAuthCode(requestAuthCodeDto, eventFrameId))
                 .isInstanceOf(EventUserException.class)
                 .hasMessage(ErrorCode.BAD_REQUEST.getMessage());
     }
