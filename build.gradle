@@ -61,6 +61,9 @@ dependencies {
 
 	// sms api
 	implementation 'net.nurigo:sdk:4.3.0'
+
+	// test db
+	testRuntimeOnly 'com.h2database:h2'
 }
 
 tasks.named('test') {

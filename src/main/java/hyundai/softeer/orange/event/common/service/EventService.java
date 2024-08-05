@@ -68,6 +68,11 @@ public class EventService {
         Optional<EventMetadata> metadataOpt = emRepository.findFirstByEventId(eventId);
         EventMetadata eventMetadata = metadataOpt
                 .orElseThrow(() -> new EventException(ErrorCode.EVENT_NOT_FOUND));
+        eventMetadata.updateName(eventDto.getName());
+        eventMetadata.updateDescription(eventDto.getDescription());
+        eventMetadata.updateStartTime(eventDto.getStartTime());
+        eventMetadata.updateEndTime(eventDto.getEndTime());
+        eventMetadata.updateUrl(eventDto.getUrl());
 
         EventFieldMapper mapper = mapperMatcher.getMapper(eventDto.getEventType());
         if(mapper == null) throw new EventException(ErrorCode.INVALID_EVENT_TYPE);

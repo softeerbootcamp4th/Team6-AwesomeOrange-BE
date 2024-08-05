@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("/event")
+@RequestMapping("/api/v1/event")
 @RestController
 public class EventController {
     private final EventService eventService;
