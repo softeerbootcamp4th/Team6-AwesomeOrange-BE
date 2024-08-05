@@ -2,7 +2,6 @@ package hyundai.softeer.orange.event.common.service;
 
 import hyundai.softeer.orange.common.ErrorCode;
 import hyundai.softeer.orange.event.common.component.eventFieldMapper.EventFieldMapperMatcher;
-import hyundai.softeer.orange.event.common.component.eventFieldMapper.mapper.EventFieldMapper;
 import hyundai.softeer.orange.event.common.component.eventFieldMapper.mapper.FcfsEventFieldMapper;
 import hyundai.softeer.orange.event.common.entity.EventFrame;
 import hyundai.softeer.orange.event.common.entity.EventMetadata;
@@ -12,17 +11,14 @@ import hyundai.softeer.orange.event.common.repository.EventFrameRepository;
 import hyundai.softeer.orange.event.common.repository.EventMetadataRepository;
 import hyundai.softeer.orange.event.component.EventKeyGenerator;
 import hyundai.softeer.orange.event.dto.EventDto;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
@@ -46,7 +42,7 @@ class EventServiceTest {
     @DisplayName("대응되는 eventframe이 없으면 예외 반환")
     @Test
     void createEvent_throwErrorIFNoMatchedEventFrame() {
-        EventDto eventDto = new EventDto();
+        EventDto eventDto = EventDto.builder().build();
 
         assertThatThrownBy(() -> {
             eventService.createEvent(eventDto);

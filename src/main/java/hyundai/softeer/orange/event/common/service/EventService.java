@@ -17,7 +17,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -36,9 +35,9 @@ public class EventService {
     public void createEvent(EventDto eventDto) {
         // 1. eventframe을 찾는다. 없으면 작업이 의미 X
         Optional<EventFrame> frameOpt = efRepository.findByName(eventDto.getTag());
-        if (frameOpt.isEmpty()) throw new EventException(ErrorCode.EVENT_FRAME_NOT_FOUND);
+        EventFrame frame = frameOpt
+                .orElseThrow(() -> new EventException(ErrorCode.EVENT_FRAME_NOT_FOUND));
 
-        EventFrame frame = frameOpt.get();
         String eventKey = keyGenerator.generate();
 
         // 2. 이벤트 메타데이터 객체를 생성한다.
@@ -56,11 +55,49 @@ public class EventService {
 
         EventType type = eventDto.getEventType();
         EventFieldMapper mapper = mapperMatcher.getMapper(type);
-
         if(mapper == null) throw new EventException(ErrorCode.INVALID_EVENT_TYPE);
-        mapper.handle(eventMetadata, eventDto);
+
+        mapper.fetchToEventEntity(eventMetadata, eventDto);
 
         emRepository.save(eventMetadata);
+    }
+
+    @Transactional
+    public void editEvent(EventDto eventDto) {
+        String eventId = eventDto.getEventId();
+        Optional<EventMetadata> metadataOpt = emRepository.findFirstByEventId(eventId);
+        EventMetadata eventMetadata = metadataOpt
+                .orElseThrow(() -> new EventException(ErrorCode.EVENT_NOT_FOUND));
+
+        EventFieldMapper mapper = mapperMatcher.getMapper(eventDto.getEventType());
+        if(mapper == null) throw new EventException(ErrorCode.INVALID_EVENT_TYPE);
+
+        mapper.editEventField(eventMetadata, eventDto);
+        emRepository.save(eventMetadata);
+    }
+
+    @Transactional
+    public EventDto getEventInfo(String eventId) {
+        Optional<EventMetadata> metadataOpt = emRepository.findFirstByEventId(eventId);
+        EventMetadata metadata = metadataOpt
+                .orElseThrow(() -> new EventException(ErrorCode.EVENT_NOT_FOUND));
+
+        EventFieldMapper mapper = mapperMatcher.getMapper(metadata.getEventType());
+        if(mapper == null) throw new EventException(ErrorCode.INVALID_EVENT_TYPE);
+
+        EventDto eventDto = EventDto.builder()
+                .id(metadata.getId())
+                .eventId(metadata.getEventId())
+                .name(metadata.getName())
+                .description(metadata.getDescription())
+                .url(metadata.getUrl())
+                .startTime(metadata.getStartTime())
+                .endTime(metadata.getEndTime())
+                .eventType(metadata.getEventType())
+                .build();
+
+        mapper.fetchToDto(metadata, eventDto);
+        return eventDto;
     }
 
     @Transactional
@@ -68,4 +105,5 @@ public class EventService {
         EventFrame eventFrame = EventFrame.of(name);
         efRepository.save(eventFrame);
     }
+
 }
