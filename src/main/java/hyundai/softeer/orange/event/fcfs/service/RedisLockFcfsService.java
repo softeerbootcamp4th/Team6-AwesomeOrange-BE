@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -19,11 +20,24 @@ import java.util.concurrent.TimeUnit;
 public class RedisLockFcfsService implements FcfsService {
 
     private final StringRedisTemplate stringRedisTemplate;
+    private final RedisTemplate<String, Boolean> booleanRedisTemplate;
     private final RedissonClient redissonClient;
+    private final RedisTemplate<String, Integer> numberRedisTemplate;
 
     @Override
     public boolean participate(Long eventSequence, String userId) {
-        // time check
+        String fcfsId = FcfsUtil.keyFormatting(eventSequence.toString());
+        // 불필요한 Lock 접근을 막기 위한 종료 flag 확인
+        if (isEventEnded(fcfsId)) {
+            return false;
+        }
+
+        // 이미 당첨된 사용자인지 확인
+        if(stringRedisTemplate.opsForZSet().rank(FcfsUtil.winnerFormatting(eventSequence.toString()), userId) != null){
+            throw new FcfsEventException(ErrorCode.ALREADY_WINNER);
+        }
+
+        // 잘못된 이벤트 참여 시간
         String startTime = stringRedisTemplate.opsForValue().get(FcfsUtil.startTimeFormatting(eventSequence.toString()));
         if(startTime == null) {
             throw new FcfsEventException(ErrorCode.FCFS_EVENT_NOT_FOUND);
@@ -33,32 +47,23 @@ public class RedisLockFcfsService implements FcfsService {
             throw new FcfsEventException(ErrorCode.INVALID_EVENT_TIME);
         }
 
-        final String fcfsId = FcfsUtil.keyFormatting(eventSequence.toString());
-
-        // 불필요한 Lock 접근을 막기 위한 종료 flag 확인
-        if (isEventEnded(fcfsId)) {
-            log.info("{} 선착순 이벤트 마감으로 참석 실패", userId);
-            return false;
-        }
-
+        // Lock을 이용한 참여 처리
         final RLock lock = redissonClient.getLock("LOCK:" + fcfsId);
-
         try {
             boolean usingLock = lock.tryLock(1L, 3L, TimeUnit.SECONDS);
             if (!usingLock) {
                 return false;
             }
 
-            final int quantity = availableCoupons(fcfsId);
+            final long quantity = availableCoupons(fcfsId);
             if (quantity <= 0) {
-                log.info("{} - 쿠폰 소진으로 참석 실패", userId);
                 endEvent(fcfsId);  // 이벤트 종료 플래그 설정
                 return false;
             }
 
-            redissonClient.getBucket(fcfsId).set(quantity-1);
-            stringRedisTemplate.opsForSet().add(FcfsUtil.winnerFormatting(eventSequence.toString()), userId);
-            log.info("{} - 잔여 쿠폰: {}", userId, availableCoupons(fcfsId));
+            numberRedisTemplate.opsForValue().decrement(fcfsId);
+            stringRedisTemplate.opsForZSet().add(FcfsUtil.winnerFormatting(eventSequence.toString()), userId, System.currentTimeMillis());
+            log.info("{} - 이벤트 참여 성공, 잔여 쿠폰: {}", userId, availableCoupons(fcfsId));
             return true;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
@@ -70,15 +75,15 @@ public class RedisLockFcfsService implements FcfsService {
         }
     }
 
-    private int availableCoupons(String key) {
-        return (int) redissonClient.getBucket(key).get();
+    private Integer availableCoupons(String key) {
+        return numberRedisTemplate.opsForValue().get(key);
     }
 
     private boolean isEventEnded(String fcfsId) {
-        return redissonClient.getBucket(FcfsUtil.endFlagFormatting(fcfsId)).get() != null;
+        return booleanRedisTemplate.opsForValue().get(FcfsUtil.endFlagFormatting(fcfsId)) != null;
     }
 
     private void endEvent(String fcfsId) {
-        redissonClient.getBucket(FcfsUtil.endFlagFormatting(fcfsId)).set(true);
+        booleanRedisTemplate.opsForValue().set(FcfsUtil.endFlagFormatting(fcfsId), true);
     }
 }

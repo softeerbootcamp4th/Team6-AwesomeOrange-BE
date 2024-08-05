@@ -11,7 +11,7 @@ import hyundai.softeer.orange.event.fcfs.util.FcfsUtil;
 import hyundai.softeer.orange.eventuser.entity.EventUser;
 import hyundai.softeer.orange.eventuser.repository.EventUserRepository;
 import lombok.RequiredArgsConstructor;
-import org.redisson.api.RedissonClient;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,15 +28,17 @@ public class FcfsManageService {
     private final FcfsEventRepository fcfsEventRepository;
     private final FcfsEventWinningInfoRepository fcfsEventWinningInfoRepository;
     private final StringRedisTemplate stringRedisTemplate;
-    private final RedissonClient redissonClient;
+    private final RedisTemplate<String, Integer> numberRedisTemplate;
+    private final RedisTemplate<String, Boolean> booleanRedisTemplate;
 
     // 오늘의 선착순 이벤트 정보(당첨자 수, 시작 시각)를 Redis에 배치
     @Transactional(readOnly = true)
     public void registerFcfsEvents() {
         List<FcfsEvent> events = fcfsEventRepository.findByStartTimeBetween(LocalDateTime.now(), LocalDateTime.now().plusDays(1));
-        events.forEach(event -> {
-            redissonClient.getBucket(FcfsUtil.keyFormatting(event.getId().toString())).set(event.getParticipantCount());
-            stringRedisTemplate.opsForValue().set(FcfsUtil.startTimeFormatting(event.getId().toString()), event.getStartTime().toString());
+        events.forEach(event -> { // 당첨자 수, 마감 여부, 시작 시각을 저장
+                numberRedisTemplate.opsForValue().set(FcfsUtil.keyFormatting(event.getId().toString()), event.getParticipantCount().intValue());
+                booleanRedisTemplate.opsForValue().set(FcfsUtil.endFlagFormatting(event.getId().toString()), false);
+                stringRedisTemplate.opsForValue().set(FcfsUtil.startTimeFormatting(event.getId().toString()), event.getStartTime().toString());
         });
     }
 
@@ -69,8 +71,10 @@ public class FcfsManageService {
                     .toList();
 
             fcfsEventWinningInfoRepository.saveAll(winningInfos);
-            redissonClient.getBucket(FcfsUtil.keyFormatting(eventId)).delete();
-            stringRedisTemplate.delete(FcfsUtil.startTimeFormatting(eventId));
+
+            stringRedisTemplate.delete(FcfsUtil.startTimeFormatting(event.getId().toString()));
+            numberRedisTemplate.delete(FcfsUtil.keyFormatting(eventId));
+            booleanRedisTemplate.delete(FcfsUtil.endFlagFormatting(eventId));
         }
     }
 
