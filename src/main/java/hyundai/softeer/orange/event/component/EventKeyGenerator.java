@@ -25,7 +25,7 @@ public class EventKeyGenerator {
     public String generate(LocalDateTime now) {
         LocalDateTime nextDay = now.plusDays(1).toLocalDate().atTime(0,0,5);
 
-        String dateInfo = formatter.format(LocalDateTime.now());
+        String dateInfo = formatter.format(now);
         String incKey = EventConst.REDIS_KEY_PREFIX + dateInfo;
 
         Long number = redisTemplate.opsForValue().increment(incKey);
