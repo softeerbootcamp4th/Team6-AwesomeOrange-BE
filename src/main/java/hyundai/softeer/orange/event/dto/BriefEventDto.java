@@ -1,13 +1,11 @@
 package hyundai.softeer.orange.event.dto;
 
 import hyundai.softeer.orange.event.common.enums.EventType;
-import hyundai.softeer.orange.event.dto.group.EventEditGroup;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import lombok.Getter;
 
 import java.time.LocalDateTime;
 
+@Getter
 public class BriefEventDto {
     /**
      * HD000000_000 형식으로 구성된 id 값

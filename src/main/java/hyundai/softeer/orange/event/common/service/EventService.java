@@ -12,11 +12,13 @@ import hyundai.softeer.orange.event.common.enums.EventType;
 import hyundai.softeer.orange.event.common.exception.EventException;
 import hyundai.softeer.orange.event.common.repository.EventFrameRepository;
 import hyundai.softeer.orange.event.common.repository.EventMetadataRepository;
+import hyundai.softeer.orange.event.common.repository.EventSpecification;
 import hyundai.softeer.orange.event.component.EventKeyGenerator;
 import hyundai.softeer.orange.event.dto.BriefEventDto;
 import hyundai.softeer.orange.event.dto.EventDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -159,7 +161,9 @@ public class EventService {
                 sort
         );
 
-        List<EventMetadata> events = emRepository.findAllBySearch(search, pageInfo);
+        var withSearch = EventSpecification.withSearch(search);
+        Page<EventMetadata> eventPage = emRepository.findAll(withSearch, pageInfo);
+        List<EventMetadata> events = eventPage.getContent();
 
         return events.stream().map(
                 it -> BriefEventDto.of(
