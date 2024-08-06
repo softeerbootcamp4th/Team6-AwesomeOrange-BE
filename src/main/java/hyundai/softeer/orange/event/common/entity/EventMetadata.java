@@ -49,18 +49,38 @@ public class EventMetadata {
     @Column
     private EventStatus status;
 
+    public void updateName(String name) {
+        this.name = name;
+    }
+
+    public void updateDescription(String description) {
+        this.description = description;
+    }
+
+    public void updateStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public void updateEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
+    }
+
+    public void updateUrl(String url) {
+        this.url = url;
+    }
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="event_frame_id")
     private EventFrame eventFrame;
 
-    @OneToMany(mappedBy = "eventMetadata", cascade = {CascadeType.PERSIST})
+    @OneToMany(mappedBy = "eventMetadata", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private final List<DrawEvent> drawEventList = new ArrayList<>();
 
     public void addDrawEvent(DrawEvent drawEvent) {
         this.drawEventList.add(drawEvent);
     }
 
-    @OneToMany(mappedBy = "eventMetaData", cascade = {CascadeType.PERSIST})
+    @OneToMany(mappedBy = "eventMetaData", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private final List<FcfsEvent> fcfsEventList = new ArrayList<>();
 
     public void addFcfsEvents(List<FcfsEvent> fcfsEventList) {

@@ -34,6 +34,7 @@ public enum ErrorCode {
     EVENT_FRAME_NOT_FOUND(HttpStatus.NOT_FOUND, false, "이벤트 프레임을 찾을 수 없습니다."),
     EVENT_USER_NOT_FOUND(HttpStatus.NOT_FOUND, false, "이벤트 사용자를 찾을 수 없습니다."),
     COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, false, "기대평을 찾을 수 없습니다."),
+    EVENT_NOT_FOUND(HttpStatus.NOT_FOUND, false, "이벤트를 찾을 수 없습니다."),
 
     // 405 Method Not Allowed
     METHOD_NOT_ALLOWED(HttpStatus.METHOD_NOT_ALLOWED, false, "허용되지 않은 메서드입니다."),
