@@ -82,7 +82,8 @@ public class RedisLockFcfsService implements FcfsService {
     }
 
     private boolean isEventEnded(String fcfsId) {
-        return booleanRedisTemplate.opsForValue().get(FcfsUtil.endFlagFormatting(fcfsId)) != null;
+        Boolean endFlag = booleanRedisTemplate.opsForValue().get(FcfsUtil.endFlagFormatting(fcfsId));
+        return Boolean.TRUE.equals(endFlag);
     }
 
     private void endEvent(String fcfsId) {
