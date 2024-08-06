@@ -34,6 +34,7 @@ class RedisLockFcfsServiceLoadTest {
     private RedissonClient redissonClient;
 
     Long eventSequence = 1L; // 테스트할 이벤트 시퀀스
+    int numberOfWinners = 100; // 당첨자 수
 
     @BeforeEach
     void setUp() {
@@ -43,7 +44,7 @@ class RedisLockFcfsServiceLoadTest {
 
         // 테스트할 이벤트 정보 저장
         booleanRedisTemplate.opsForValue().set(FcfsUtil.endFlagFormatting(eventSequence.toString()), false);
-        numberRedisTemplate.opsForValue().set(FcfsUtil.keyFormatting(eventSequence.toString()), 30);
+        numberRedisTemplate.opsForValue().set(FcfsUtil.keyFormatting(eventSequence.toString()), numberOfWinners);
         stringRedisTemplate.opsForValue().set(FcfsUtil.startTimeFormatting(eventSequence.toString()), "2021-08-01T00:00:00");
     }
 
