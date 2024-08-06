@@ -17,7 +17,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -72,13 +71,13 @@ public class EventController {
      * @return 해당 이벤트에 대한 정보
      */
     @Auth({AuthRole.admin})
-    @GetMapping("/edit")
+    @GetMapping("{eventId}")
     @Operation(summary = "이벤트 데이터 획득", description = "이벤트 초기 정보를 받는다", responses = {
             @ApiResponse(responseCode = "200", description = "이벤트 정보를 정상적으로 받음"),
             @ApiResponse(responseCode = "404", description = "대응되는 이벤트가 존재하지 않음")
     })
-    public ResponseEntity<EventDto> getEventEditData(
-            @RequestParam("eventId") String eventId
+    public ResponseEntity<EventDto> getEventData(
+            @PathVariable("eventId") String eventId
     ) {
         EventDto eventInfo = eventService.getEventInfo(eventId);
         return ResponseEntity.ok(eventInfo);
