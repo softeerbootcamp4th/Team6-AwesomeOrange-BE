@@ -14,6 +14,8 @@ import hyundai.softeer.orange.event.dto.EventDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.test.context.TestPropertySource;
 
 import java.util.Optional;
 
@@ -23,6 +25,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
+
+@DataJpaTest
+@TestPropertySource(locations = "classpath:application-test.yml")
 class EventServiceTest {
     private EventService eventService;
     private EventFrameRepository efRepo;
