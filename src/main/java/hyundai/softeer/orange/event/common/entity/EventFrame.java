@@ -19,7 +19,7 @@ public class EventFrame {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column
+    @Column(unique = true, nullable = false)
     private String name;
 
     @OneToMany(mappedBy="eventFrame")
