@@ -21,6 +21,7 @@ public class RedisLuaFcfsService implements FcfsService {
     private final StringRedisTemplate stringRedisTemplate;
     private final RedisTemplate<String, Integer> numberRedisTemplate;
     private final RedisTemplate<String, Boolean> booleanRedisTemplate;
+    private final RedisScript<Long> redisScript;
 
     @Override
     public boolean participate(Long eventSequence, String userId) {
@@ -45,15 +46,8 @@ public class RedisLuaFcfsService implements FcfsService {
         }
 
         long timestamp = System.currentTimeMillis();
-        String script = "local count = redis.call('zcard', KEYS[1]) " +
-                "if count < tonumber(ARGV[1]) then " +
-                "    redis.call('zadd', KEYS[1], ARGV[2], ARGV[3]) " +
-                "    return redis.call('zcard', KEYS[1]) " +
-                "else " +
-                "    return 0 " +
-                "end";
         Long result = stringRedisTemplate.execute(
-                RedisScript.of(script, Long.class),
+                redisScript,
                 Collections.singletonList(FcfsUtil.winnerFormatting(eventSequence.toString())),
                 String.valueOf(numberRedisTemplate.opsForValue().get(fcfsId)),
                 String.valueOf(timestamp),

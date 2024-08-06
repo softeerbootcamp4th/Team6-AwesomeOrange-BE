@@ -11,6 +11,7 @@ import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.script.RedisScript;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
@@ -72,5 +73,17 @@ public class RedisConfig {
                 .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer()))
                 .entryTtl(Duration.ofMinutes(120L)); // 캐시 만료 시간 2시간
         return RedisCacheManager.RedisCacheManagerBuilder.fromConnectionFactory(cf).cacheDefaults(redisCacheConfiguration).build();
+    }
+
+    @Bean
+    public RedisScript<Long> redisScript() {
+        String script = "local count = redis.call('zcard', KEYS[1]) " +
+                "if count < tonumber(ARGV[1]) then " +
+                "    redis.call('zadd', KEYS[1], ARGV[2], ARGV[3]) " +
+                "    return redis.call('zcard', KEYS[1]) " +
+                "else " +
+                "    return 0 " +
+                "end";
+        return RedisScript.of(script, Long.class);
     }
 }
