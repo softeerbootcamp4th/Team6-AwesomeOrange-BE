@@ -57,10 +57,7 @@ public class FcfsManageService {
             FcfsEvent event = fcfsEventRepository.findById(Long.parseLong(eventId))
                     .orElseThrow(() -> new FcfsEventException(ErrorCode.FCFS_EVENT_NOT_FOUND));
 
-            List<EventUser> users = eventUserRepository.findAllById(
-                    userIds.stream()
-                            .map(Long::parseLong)
-                            .toList());
+            List<EventUser> users = eventUserRepository.findAllByUserId(userIds.stream().toList());
 
             List<FcfsEventWinningInfo> winningInfos = users
                     .stream()
@@ -91,7 +88,7 @@ public class FcfsManageService {
 
         // FIXME: 선착순 정답 생성 과정을 별도로 관리하는 것이 좋을 듯
         // 현재 정책 상 1~4 중 하나의 숫자를 선정하여 현재 선착순 이벤트의 정답에 저장
-        int answer = new Random().nextInt() % 4 + 1;
+        int answer = new Random().nextInt(4) + 1;
         stringRedisTemplate.opsForValue().set(FcfsUtil.answerFormatting(event.getId().toString()), String.valueOf(answer));
     }
 
