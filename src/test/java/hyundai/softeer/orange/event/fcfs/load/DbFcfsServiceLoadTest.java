@@ -1,4 +1,4 @@
-package hyundai.softeer.orange.event.fcfs;
+package hyundai.softeer.orange.event.fcfs.load;
 
 import hyundai.softeer.orange.event.fcfs.entity.FcfsEvent;
 import hyundai.softeer.orange.event.fcfs.repository.FcfsEventRepository;
@@ -22,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @Slf4j
 @SpringBootTest
-class DbFcfsServiceTest {
+class DbFcfsServiceLoadTest {
 
     @Autowired
     private DbFcfsService dbFcfsService;

@@ -1,4 +1,4 @@
-package hyundai.softeer.orange.event.fcfs;
+package hyundai.softeer.orange.event.fcfs.load;
 import hyundai.softeer.orange.event.fcfs.service.RedisLuaFcfsService;
 import hyundai.softeer.orange.event.fcfs.util.FcfsUtil;
 import lombok.extern.slf4j.Slf4j;
