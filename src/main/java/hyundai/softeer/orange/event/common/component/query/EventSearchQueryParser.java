@@ -12,6 +12,7 @@ public class EventSearchQueryParser {
         String[] queries = searchQuery.split(",");
 
         for (String query : queries) {
+            if (query.isBlank()) continue;
             String[] pair = query.split(":");
             if(pair.length <= 0 || pair.length > 2) continue; // 값이 없거나 넘치면 무시.
             String key = pair[0].trim();
