@@ -2,10 +2,7 @@ package hyundai.softeer.orange.event.fcfs.entity;
 
 import hyundai.softeer.orange.event.common.entity.EventMetadata;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -15,7 +12,7 @@ import java.util.List;
 @Getter
 @Entity
 @Builder
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class FcfsEvent {
     @Id
@@ -38,6 +35,9 @@ public class FcfsEvent {
     @JoinColumn(name = "event_metadata_id")
     private EventMetadata eventMetaData;
 
+    @OneToMany(mappedBy = "fcfsEvent")
+    private final List<FcfsEventWinningInfo> infos = new ArrayList<>();
+
     public void updateStartTime(LocalDateTime startTime) {
         this.startTime = startTime;
     }
@@ -53,9 +53,6 @@ public class FcfsEvent {
     public void updatePrizeInfo(String prizeInfo) {
         this.prizeInfo = prizeInfo;
     }
-
-    @OneToMany(mappedBy = "fcfsEvent")
-    private final List<FcfsEventWinningInfo> infos = new ArrayList<>();
 
     public static FcfsEvent of(LocalDateTime startTime, LocalDateTime endTime, Long participantCount, String prizeInfo, EventMetadata eventMetadata) {
         FcfsEvent fcfsEvent = new FcfsEvent();

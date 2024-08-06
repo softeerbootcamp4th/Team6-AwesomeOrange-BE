@@ -44,7 +44,6 @@ public class RedisLuaFcfsService implements FcfsService {
             throw new FcfsEventException(ErrorCode.INVALID_EVENT_TIME);
         }
 
-        long timestamp = System.currentTimeMillis();
         String script = "local count = redis.call('zcard', KEYS[1]) " +
                 "if count < tonumber(ARGV[1]) then " +
                 "    redis.call('zadd', KEYS[1], ARGV[2], ARGV[3]) " +
@@ -52,6 +51,7 @@ public class RedisLuaFcfsService implements FcfsService {
                 "else " +
                 "    return 0 " +
                 "end";
+        long timestamp = System.currentTimeMillis();
         Long result = stringRedisTemplate.execute(
                 RedisScript.of(script, Long.class),
                 Collections.singletonList(FcfsUtil.winnerFormatting(eventSequence.toString())),

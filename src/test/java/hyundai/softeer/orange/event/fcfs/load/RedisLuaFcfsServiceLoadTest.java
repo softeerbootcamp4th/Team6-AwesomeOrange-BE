@@ -1,4 +1,4 @@
-package hyundai.softeer.orange.event.fcfs;
+package hyundai.softeer.orange.event.fcfs.load;
 import hyundai.softeer.orange.event.fcfs.service.RedisLuaFcfsService;
 import hyundai.softeer.orange.event.fcfs.util.FcfsUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +31,7 @@ class RedisLuaFcfsServiceLoadTest {
     RedisTemplate<String, Boolean> booleanRedisTemplate;
 
     Long eventSequence = 1L; // 테스트할 이벤트 시퀀스
+    int numberOfWinners = 100; // 당첨자 수
 
     @BeforeEach
     void setUp() {
@@ -40,7 +41,7 @@ class RedisLuaFcfsServiceLoadTest {
         booleanRedisTemplate.getConnectionFactory().getConnection().flushAll();
 
         // 테스트할 이벤트 정보 저장
-        numberRedisTemplate.opsForValue().set(FcfsUtil.keyFormatting(eventSequence.toString()), 100);
+        numberRedisTemplate.opsForValue().set(FcfsUtil.keyFormatting(eventSequence.toString()), numberOfWinners);
         stringRedisTemplate.opsForValue().set(FcfsUtil.startTimeFormatting(eventSequence.toString()), "2021-08-01T00:00:00");
     }
 
@@ -73,6 +74,6 @@ class RedisLuaFcfsServiceLoadTest {
 
         executorService.shutdown();
         Long count = stringRedisTemplate.opsForZSet().zCard(FcfsUtil.winnerFormatting(eventSequence.toString()));
-        assertThat(count).isEqualTo(100);
+        assertThat(count).isEqualTo(numberOfWinners);
     }
 }
