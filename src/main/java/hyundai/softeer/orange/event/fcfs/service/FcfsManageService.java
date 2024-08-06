@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
 @RequiredArgsConstructor
@@ -87,6 +88,11 @@ public class FcfsManageService {
         numberRedisTemplate.opsForValue().set(FcfsUtil.keyFormatting(event.getId().toString()), event.getParticipantCount().intValue());
         booleanRedisTemplate.opsForValue().set(FcfsUtil.endFlagFormatting(event.getId().toString()), false);
         stringRedisTemplate.opsForValue().set(FcfsUtil.startTimeFormatting(event.getId().toString()), event.getStartTime().toString());
+
+        // FIXME: 선착순 정답 생성 과정을 별도로 관리하는 것이 좋을 듯
+        // 현재 정책 상 1~4 중 하나의 숫자를 선정하여 현재 선착순 이벤트의 정답에 저장
+        int answer = new Random().nextInt() % 4 + 1;
+        stringRedisTemplate.opsForValue().set(FcfsUtil.answerFormatting(event.getId().toString()), String.valueOf(answer));
     }
 
     public void deleteEventInfo(String eventId) {

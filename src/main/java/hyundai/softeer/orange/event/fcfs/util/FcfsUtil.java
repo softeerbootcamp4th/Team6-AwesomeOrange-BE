@@ -21,4 +21,8 @@ public class FcfsUtil {
     public static String winnerFormatting(String fcfsId) {
         return fcfsId + "_winner";
     }
+
+    public static String answerFormatting(String key) {
+        return key + ":answer";
+    }
 }
