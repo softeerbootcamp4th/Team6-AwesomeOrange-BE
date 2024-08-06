@@ -35,11 +35,7 @@ public class FcfsManageService {
     @Transactional(readOnly = true)
     public void registerFcfsEvents() {
         List<FcfsEvent> events = fcfsEventRepository.findByStartTimeBetween(LocalDateTime.now(), LocalDateTime.now().plusDays(1));
-        events.forEach(event -> { // 당첨자 수, 마감 여부, 시작 시각을 저장
-                numberRedisTemplate.opsForValue().set(FcfsUtil.keyFormatting(event.getId().toString()), event.getParticipantCount().intValue());
-                booleanRedisTemplate.opsForValue().set(FcfsUtil.endFlagFormatting(event.getId().toString()), false);
-                stringRedisTemplate.opsForValue().set(FcfsUtil.startTimeFormatting(event.getId().toString()), event.getStartTime().toString());
-        });
+        events.forEach(this::prepareEventInfo);
     }
 
     // redis에 저장된 모든 선착순 이벤트의 당첨자 정보를 DB로 이관
@@ -71,11 +67,7 @@ public class FcfsManageService {
                     .toList();
 
             fcfsEventWinningInfoRepository.saveAll(winningInfos);
-
-            stringRedisTemplate.delete(FcfsUtil.startTimeFormatting(event.getId().toString()));
-            stringRedisTemplate.delete(FcfsUtil.winnerFormatting(event.getId().toString()));
-            numberRedisTemplate.delete(FcfsUtil.keyFormatting(eventId));
-            booleanRedisTemplate.delete(FcfsUtil.endFlagFormatting(eventId));
+            deleteEventInfo(eventId);
         }
     }
 
@@ -89,5 +81,18 @@ public class FcfsManageService {
                         .phoneNumber(winningInfo.getEventUser().getPhoneNumber())
                         .build())
                 .toList();
+    }
+
+    private void prepareEventInfo(FcfsEvent event) {
+        numberRedisTemplate.opsForValue().set(FcfsUtil.keyFormatting(event.getId().toString()), event.getParticipantCount().intValue());
+        booleanRedisTemplate.opsForValue().set(FcfsUtil.endFlagFormatting(event.getId().toString()), false);
+        stringRedisTemplate.opsForValue().set(FcfsUtil.startTimeFormatting(event.getId().toString()), event.getStartTime().toString());
+    }
+
+    public void deleteEventInfo(String eventId) {
+        stringRedisTemplate.delete(FcfsUtil.startTimeFormatting(eventId));
+        stringRedisTemplate.delete(FcfsUtil.winnerFormatting(eventId));
+        numberRedisTemplate.delete(FcfsUtil.keyFormatting(eventId));
+        booleanRedisTemplate.delete(FcfsUtil.endFlagFormatting(eventId));
     }
 }
