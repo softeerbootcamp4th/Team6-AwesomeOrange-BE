@@ -12,10 +12,10 @@ import hyundai.softeer.orange.event.common.repository.EventFrameRepository;
 import hyundai.softeer.orange.event.common.repository.EventMetadataRepository;
 import hyundai.softeer.orange.event.component.EventKeyGenerator;
 import hyundai.softeer.orange.event.dto.EventDto;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -81,7 +81,7 @@ public class EventService {
         emRepository.save(eventMetadata);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public EventDto getEventInfo(String eventId) {
         Optional<EventMetadata> metadataOpt = emRepository.findFirstByEventId(eventId);
         EventMetadata metadata = metadataOpt
