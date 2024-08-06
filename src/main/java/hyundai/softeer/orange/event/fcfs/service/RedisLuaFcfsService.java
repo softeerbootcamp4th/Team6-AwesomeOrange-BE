@@ -5,31 +5,26 @@ import hyundai.softeer.orange.event.fcfs.exception.FcfsEventException;
 import hyundai.softeer.orange.event.fcfs.util.FcfsUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.redisson.api.RLock;
-import org.redisson.api.RedissonClient;
-import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.script.RedisScript;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.concurrent.TimeUnit;
+import java.util.Collections;
 
 @Slf4j
 @RequiredArgsConstructor
 @Service
-@Primary
-public class RedisLockFcfsService implements FcfsService {
+public class RedisLuaFcfsService implements FcfsService {
 
     private final StringRedisTemplate stringRedisTemplate;
-    private final RedisTemplate<String, Boolean> booleanRedisTemplate;
-    private final RedissonClient redissonClient;
     private final RedisTemplate<String, Integer> numberRedisTemplate;
+    private final RedisTemplate<String, Boolean> booleanRedisTemplate;
 
     @Override
     public boolean participate(Long eventSequence, String userId) {
         String fcfsId = FcfsUtil.keyFormatting(eventSequence.toString());
-        // 불필요한 Lock 접근을 막기 위한 종료 flag 확인
         if (isEventEnded(fcfsId)) {
             return false;
         }
@@ -49,41 +44,34 @@ public class RedisLockFcfsService implements FcfsService {
             throw new FcfsEventException(ErrorCode.INVALID_EVENT_TIME);
         }
 
-        // Lock을 이용한 참여 처리
-        final RLock lock = redissonClient.getLock("LOCK:" + fcfsId);
-        try {
-            boolean usingLock = lock.tryLock(1L, 3L, TimeUnit.SECONDS);
-            if (!usingLock) {
-                return false;
-            }
+        long timestamp = System.currentTimeMillis();
+        String script = "local count = redis.call('zcard', KEYS[1]) " +
+                "if count < tonumber(ARGV[1]) then " +
+                "    redis.call('zadd', KEYS[1], ARGV[2], ARGV[3]) " +
+                "    return redis.call('zcard', KEYS[1]) " +
+                "else " +
+                "    return 0 " +
+                "end";
+        Long result = stringRedisTemplate.execute(
+                RedisScript.of(script, Long.class),
+                Collections.singletonList(FcfsUtil.winnerFormatting(eventSequence.toString())),
+                String.valueOf(numberRedisTemplate.opsForValue().get(fcfsId)),
+                String.valueOf(timestamp),
+                userId
+        );
 
-            final long quantity = availableCoupons(fcfsId);
-            if (quantity <= 0) {
-                endEvent(fcfsId);  // 이벤트 종료 플래그 설정
-                return false;
-            }
-
-            numberRedisTemplate.opsForValue().decrement(fcfsId);
-            stringRedisTemplate.opsForZSet().add(FcfsUtil.winnerFormatting(eventSequence.toString()), userId, System.currentTimeMillis());
-            log.info("{} - 이벤트 참여 성공, 잔여 쿠폰: {}", userId, availableCoupons(fcfsId));
-            return true;
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
+        if(result == null || result <= 0) {
+            endEvent(fcfsId);  // 이벤트 종료 플래그 설정
             return false;
-        } finally {
-            if (lock.isHeldByCurrentThread()) {
-                lock.unlock();
-            }
         }
-    }
 
-    private Integer availableCoupons(String key) {
-        return numberRedisTemplate.opsForValue().get(key);
+        stringRedisTemplate.opsForZSet().add(FcfsUtil.winnerFormatting(eventSequence.toString()), userId, System.currentTimeMillis());
+        log.info("Event Sequence: {}, User ID: {}, Timestamp: {}", eventSequence, userId, timestamp);
+        return true;
     }
 
     private boolean isEventEnded(String fcfsId) {
-        Boolean endFlag = booleanRedisTemplate.opsForValue().get(FcfsUtil.endFlagFormatting(fcfsId));
-        return Boolean.TRUE.equals(endFlag);
+        return booleanRedisTemplate.opsForValue().get(FcfsUtil.endFlagFormatting(fcfsId)) != null;
     }
 
     private void endEvent(String fcfsId) {

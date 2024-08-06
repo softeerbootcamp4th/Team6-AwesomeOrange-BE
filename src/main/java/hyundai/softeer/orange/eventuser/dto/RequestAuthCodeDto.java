@@ -25,7 +25,4 @@ public class RequestAuthCodeDto {
     @NotNull
     @Pattern(regexp = ConstantUtil.AUTH_CODE_REGEX, message = MessageUtil.INVALID_AUTH_CODE)
     private String authCode;
-
-    @NotNull(message = MessageUtil.BAD_INPUT)
-    private Long eventFrameId;
 }

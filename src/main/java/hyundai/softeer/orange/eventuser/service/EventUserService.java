@@ -51,7 +51,7 @@ public class EventUserService {
      * 4. 전화번호로 발송된 인증번호가 존재하지 않는다면 400 예외
      */
     @Transactional
-    public TokenDto checkAuthCode(RequestAuthCodeDto dto) {
+    public TokenDto checkAuthCode(RequestAuthCodeDto dto, Long eventFrameId) {
         // Redis에서 인증번호 조회
         String authCode = stringRedisTemplate.opsForValue().get(dto.getPhoneNumber());
         if(authCode == null) {
@@ -66,7 +66,7 @@ public class EventUserService {
         stringRedisTemplate.delete(dto.getPhoneNumber());
 
         // DB에 유저 데이터 저장
-        EventFrame eventFrame = eventFrameRepository.findById(dto.getEventFrameId())
+        EventFrame eventFrame = eventFrameRepository.findById(eventFrameId)
                 .orElseThrow(() -> new EventUserException(ErrorCode.EVENT_FRAME_NOT_FOUND));
         String userId = UUID.randomUUID().toString().substring(0, 8);
         EventUser eventUser = EventUser.of(dto.getName(), dto.getPhoneNumber(), eventFrame, userId);

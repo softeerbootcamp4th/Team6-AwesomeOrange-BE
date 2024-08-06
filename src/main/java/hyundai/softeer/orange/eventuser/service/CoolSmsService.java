@@ -1,8 +1,11 @@
 package hyundai.softeer.orange.eventuser.service;
 
+import hyundai.softeer.orange.common.ErrorCode;
 import hyundai.softeer.orange.common.util.ConstantUtil;
 import hyundai.softeer.orange.eventuser.config.CoolSmsApiConfig;
 import hyundai.softeer.orange.eventuser.dto.RequestUserDto;
+import hyundai.softeer.orange.eventuser.exception.EventUserException;
+import hyundai.softeer.orange.eventuser.repository.EventUserRepository;
 import lombok.extern.slf4j.Slf4j;
 import net.nurigo.sdk.NurigoApp;
 import net.nurigo.sdk.message.model.Message;
@@ -21,15 +24,21 @@ public class CoolSmsService implements SmsService {
     private final DefaultMessageService defaultMessageService;
     private final CoolSmsApiConfig coolSmsApiConfig;
     private final StringRedisTemplate stringRedisTemplate;
+    private final EventUserRepository eventUserRepository;
 
-    public CoolSmsService(CoolSmsApiConfig coolSmsApiConfig, StringRedisTemplate stringRedisTemplate) {
+    public CoolSmsService(CoolSmsApiConfig coolSmsApiConfig, StringRedisTemplate stringRedisTemplate, EventUserRepository eventUserRepository) {
         this.defaultMessageService = NurigoApp.INSTANCE.initialize(coolSmsApiConfig.getApiKey(), coolSmsApiConfig.getApiSecret(), coolSmsApiConfig.getUrl());
         this.coolSmsApiConfig = coolSmsApiConfig;
         this.stringRedisTemplate = stringRedisTemplate;
+        this.eventUserRepository = eventUserRepository;
     }
 
     @Override
     public void sendSms(RequestUserDto dto) {
+        if(eventUserRepository.existsByPhoneNumber(dto.getPhoneNumber())) {
+            throw new EventUserException(ErrorCode.PHONE_NUMBER_ALREADY_EXISTS);
+        }
+
         String authCode = generateAuthCode();
         Message message = new Message();
         message.setFrom(coolSmsApiConfig.getFrom());
@@ -42,7 +51,7 @@ public class CoolSmsService implements SmsService {
     }
 
     // 6자리 난수 인증번호 생성
-    String generateAuthCode() {
+    private String generateAuthCode() {
         return String.format(ConstantUtil.AUTH_CODE_CREATE_REGEX, new Random().nextInt(1000000));
     }
 }
