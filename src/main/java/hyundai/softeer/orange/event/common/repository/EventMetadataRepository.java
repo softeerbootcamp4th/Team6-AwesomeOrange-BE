@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface EventMetadataRepository extends JpaRepository<EventMetadata, Long> {
+public interface EventMetadataRepository extends JpaRepository<EventMetadata, Long>, CustomEventMetadataRepository {
     Optional<EventMetadata> findFirstByEventId(String eventId);
 }

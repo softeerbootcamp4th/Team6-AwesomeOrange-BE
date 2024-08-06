@@ -3,6 +3,7 @@ package hyundai.softeer.orange.event.common.controller;
 import hyundai.softeer.orange.core.auth.Auth;
 import hyundai.softeer.orange.core.auth.AuthRole;
 import hyundai.softeer.orange.event.common.service.EventService;
+import hyundai.softeer.orange.event.dto.BriefEventDto;
 import hyundai.softeer.orange.event.dto.EventDto;
 import hyundai.softeer.orange.event.dto.EventFrameCreateRequest;
 import hyundai.softeer.orange.event.dto.group.EventEditGroup;
@@ -16,15 +17,42 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * 이벤트 관련 CRUD를 다루는 API
  */
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/event")
+@RequestMapping("/api/v1/events")
 @RestController
 public class EventController {
     private final EventService eventService;
+
+
+    /**
+     *
+     * @param search
+     * @param sort 정렬 기준. (eventId|:(asc|desc)
+     * @param page 페이지 번호
+     * @param size 한번에 검색하는 이벤트 개수
+     * @return 요청한 이벤트 리스트
+     */
+    @Auth({AuthRole.admin})
+    @GetMapping
+    @Operation(summary = "이벤트 리스트 획득", description = "관리자가 이벤트 목록을 검색한다. 검색어, sort 기준 등을 정의할 수 있다.", responses = {
+            @ApiResponse(responseCode = "200", description = "성공적으로 이벤트 목록을 반환한다"),
+            @ApiResponse(responseCode = "5xx", description = "서버 내부적 에러"),
+            @ApiResponse(responseCode = "4xx", description = "클라이언트 에러 (보통 page / size 값을 잘못 지정) ")
+    })
+    public ResponseEntity<List<BriefEventDto>> getEvents(
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) String sort,
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer size) {
+        List<BriefEventDto> events = eventService.searchEvents(search, sort, page, size);
+        return ResponseEntity.ok(events);
+    }
 
     @Auth({AuthRole.admin})
     @PostMapping
@@ -57,13 +85,10 @@ public class EventController {
             @ApiResponse(responseCode = "4xx", description = "유저 측 실수로 이벤트 생성 실패")
     })
     public ResponseEntity<?> editEvent(
-            @Validated({EventEditGroup.class}) @RequestBody EventDto eventDto
-    ) {
+            @Validated({EventEditGroup.class}) @RequestBody EventDto eventDto) {
         eventService.editEvent(eventDto);
         return ResponseEntity.ok().build();
     }
-
-
 
     @Auth({AuthRole.admin})
     @PostMapping("/frame")
