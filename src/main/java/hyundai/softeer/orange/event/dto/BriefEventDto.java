@@ -5,6 +5,9 @@ import lombok.Getter;
 
 import java.time.LocalDateTime;
 
+/**
+ * 이벤트 리스트를 위한 정보만 담고 있는 객체
+ */
 @Getter
 public class BriefEventDto {
     /**

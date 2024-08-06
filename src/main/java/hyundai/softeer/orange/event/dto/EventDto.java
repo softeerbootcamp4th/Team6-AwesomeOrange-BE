@@ -16,14 +16,14 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * 이벤트 정보를 포현하는 객체
+ */
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 public class EventDto {
-    @NotNull(groups = {EventEditGroup.class})
-    Long id;
-
     /**
      * HD000000_000 형식으로 구성된 id 값
      */

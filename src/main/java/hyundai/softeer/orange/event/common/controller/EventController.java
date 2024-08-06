@@ -31,8 +31,6 @@ import java.util.List;
 @RestController
 public class EventController {
     private final EventService eventService;
-
-
     /**
      *
      * @param search 검색어
@@ -86,6 +84,9 @@ public class EventController {
         return ResponseEntity.ok(eventInfo);
     }
 
+    /**
+     * @param eventDto 수정된 이벤트 정보
+     */
     @Auth({AuthRole.admin})
     @PostMapping("/edit")
     @Operation(summary = "이벤트 수정", description = "관리자가 이벤트를 수정한다", responses = {
@@ -98,6 +99,9 @@ public class EventController {
         return ResponseEntity.ok().build();
     }
 
+    /**
+     * @param req 이벤트 프레임 생성을 위한 json
+     */
     @Auth({AuthRole.admin})
     @PostMapping("/frame")
     @Operation(summary = "이벤트 프레임 생성", description = "관리자가 이벤트 프레임을 새롭게 등록한다", responses = {

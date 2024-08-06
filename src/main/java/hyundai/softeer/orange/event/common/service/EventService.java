@@ -113,7 +113,6 @@ public class EventService {
         if(mapper == null) throw new EventException(ErrorCode.INVALID_EVENT_TYPE);
 
         EventDto eventDto = EventDto.builder()
-                .id(metadata.getId())
                 .eventId(metadata.getEventId())
                 .name(metadata.getName())
                 .description(metadata.getDescription())
