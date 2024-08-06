@@ -44,13 +44,14 @@ class FcfsControllerTest {
 
     ObjectMapper mapper = new ObjectMapper();
 
-    @DisplayName("participate: 정답도 맞히며 선착순 이벤트 참여 성공")
-    @Test
-    void participateTest() throws Exception {
+    @DisplayName("participate: 정답을 맞힌 상태에서 선착순 이벤트 참여 혹은 실패")
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void participateTest(boolean isWinner) throws Exception {
         // given
-        ResponseFcfsResultDto responseFcfsResultDto = new ResponseFcfsResultDto(true, true);
-        when(fcfsService.participate(1L, "hyundai")).thenReturn(true);
+        ResponseFcfsResultDto responseFcfsResultDto = new ResponseFcfsResultDto(true, isWinner);
         when(fcfsAnswerService.judgeAnswer(1L, "1")).thenReturn(true);
+        when(fcfsService.participate(1L, "hyundai")).thenReturn(isWinner);
         String responseBody = mapper.writeValueAsString(responseFcfsResultDto);
 
         // when & then
@@ -63,12 +64,12 @@ class FcfsControllerTest {
         verify(fcfsService, times(1)).participate(1L, "hyundai");
     }
 
-    @DisplayName("participate: 정답을 틀리면 무조건 참여 실패하며 fcfsService에 접근조차 하지 않는다.")
+    @DisplayName("participate: 정답을 맞히지 못하면 무조건 참여 실패하며 fcfsService에 접근조차 하지 않는다.")
     @Test
     void participateWrongAnswerTest() throws Exception {
         // given
         ResponseFcfsResultDto responseFcfsResultDto = new ResponseFcfsResultDto(false, false);
-        when(fcfsService.participate(1L, "hyundai")).thenReturn(false);
+        when(fcfsAnswerService.judgeAnswer(1L, "1")).thenReturn(false);
         String responseBody = mapper.writeValueAsString(responseFcfsResultDto);
 
         // when & then
