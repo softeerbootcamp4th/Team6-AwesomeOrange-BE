@@ -52,10 +52,13 @@ public class EventUserService {
     public TokenDto checkAuthCode(RequestAuthCodeDto dto, Long eventFrameId) {
         // Redis에서 인증번호 조회
         String authCode = stringRedisTemplate.opsForValue().get(dto.getPhoneNumber());
+
+        // 해당 전화번호로 발송된 인증번호가 없거나 만료된 경우
         if(authCode == null) {
-            throw new EventUserException(ErrorCode.BAD_REQUEST);
+            throw new EventUserException(ErrorCode.AUTH_CODE_EXPIRED);
         }
 
+        // 인증번호가 틀린 경우
         if (!authCode.equals(dto.getAuthCode())) {
             throw new EventUserException(ErrorCode.INVALID_AUTH_CODE);
         }

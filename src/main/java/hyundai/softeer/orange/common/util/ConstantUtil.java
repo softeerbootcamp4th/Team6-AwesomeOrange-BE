@@ -25,4 +25,5 @@ public class ConstantUtil {
     public static final int USER_ID_LENGTH = 8;
     public static final int AUTH_CODE_LENGTH = 6;
     public static final int JWT_LIFESPAN = 5;
+    public static final int AUTH_CODE_EXPIRE_TIME = 5;
 }

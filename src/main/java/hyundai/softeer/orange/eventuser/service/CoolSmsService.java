@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Service
@@ -49,7 +50,9 @@ public class CoolSmsService implements SmsService {
 
         SingleMessageSentResponse response = defaultMessageService.sendOne(new SingleMessageSendingRequest(message));
         log.info("{}에게 SMS 전송 완료: {}", dto.getPhoneNumber(), response);
-        stringRedisTemplate.opsForValue().set(dto.getPhoneNumber(), authCode);
+
+        // 5분 동안 인증번호 유효
+        stringRedisTemplate.opsForValue().set(dto.getPhoneNumber(), authCode, ConstantUtil.AUTH_CODE_EXPIRE_TIME, TimeUnit.MINUTES);
     }
 
     // 6자리 난수 인증번호 생성
