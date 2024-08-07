@@ -5,6 +5,10 @@ import hyundai.softeer.orange.comment.dto.ResponseCommentsDto;
 import hyundai.softeer.orange.comment.service.ApiService;
 import hyundai.softeer.orange.comment.service.CommentService;
 import hyundai.softeer.orange.common.ErrorResponse;
+import hyundai.softeer.orange.core.auth.Auth;
+import hyundai.softeer.orange.core.auth.AuthRole;
+import hyundai.softeer.orange.eventuser.component.EventUserAnnotation;
+import hyundai.softeer.orange.eventuser.dto.EventUserInfo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -36,6 +40,7 @@ public class CommentController {
         return ResponseEntity.ok(commentService.getComments());
     }
 
+    @Auth(AuthRole.event_user)
     @Tag(name = "Comment")
     @PostMapping
     @Operation(summary = "기대평 등록", description = "유저가 신규 기대평을 등록한다.", responses = {
@@ -46,8 +51,8 @@ public class CommentController {
             @ApiResponse(responseCode = "409", description = "하루에 여러 번의 기대평을 작성하려 할 때",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
-    public ResponseEntity<Boolean> createComment(@RequestBody @Valid CreateCommentDto dto) {
+    public ResponseEntity<Boolean> createComment(@EventUserAnnotation EventUserInfo userInfo, @RequestBody @Valid CreateCommentDto dto) {
         boolean isPositive = apiService.analyzeComment(dto.getContent());
-        return ResponseEntity.ok(commentService.createComment(dto, isPositive));
+        return ResponseEntity.ok(commentService.createComment(userInfo.getUserId(), dto, isPositive));
     }
 }
