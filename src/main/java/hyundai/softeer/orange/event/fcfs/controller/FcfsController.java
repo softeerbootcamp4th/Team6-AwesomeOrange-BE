@@ -6,6 +6,7 @@ import hyundai.softeer.orange.core.auth.AuthRole;
 import hyundai.softeer.orange.event.fcfs.dto.ResponseFcfsInfoDto;
 import hyundai.softeer.orange.event.fcfs.dto.ResponseFcfsResultDto;
 import hyundai.softeer.orange.event.fcfs.service.FcfsAnswerService;
+import hyundai.softeer.orange.event.fcfs.service.FcfsManageService;
 import hyundai.softeer.orange.event.fcfs.service.FcfsService;
 import hyundai.softeer.orange.eventuser.component.EventUserAnnotation;
 import hyundai.softeer.orange.eventuser.dto.EventUserInfo;
@@ -26,6 +27,7 @@ public class FcfsController {
 
     private final FcfsService fcfsService;
     private final FcfsAnswerService fcfsAnswerService;
+    private final FcfsManageService fcfsManageService;
 
     @Auth(AuthRole.event_user)
     @Tag(name = "fcfs")
@@ -51,6 +53,19 @@ public class FcfsController {
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseEntity<ResponseFcfsInfoDto> getFcfsInfo(@PathVariable Long eventSequence) {
-        return ResponseEntity.ok(fcfsAnswerService.getFcfsInfo(eventSequence));
+        return ResponseEntity.ok(fcfsManageService.getFcfsInfo(eventSequence));
+    }
+
+    @Auth(AuthRole.event_user)
+    @Tag(name = "fcfs")
+    @GetMapping("/participated")
+    @Operation(summary = "선착순 이벤트 참여 여부 조회", description = "정답을 맞혀서 선착순 이벤트에 참여했는지 여부를 조회한다. (당첨은 별도)", responses = {
+            @ApiResponse(responseCode = "200", description = "선착순 이벤트 당첨 성공 혹은 실패",
+                    content = @Content(schema = @Schema(implementation = ResponseFcfsResultDto.class))),
+            @ApiResponse(responseCode = "404", description = "선착순 이벤트를 찾을 수 없는 경우",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    public ResponseEntity<Boolean> isParticipated(@EventUserAnnotation EventUserInfo userInfo, @RequestParam Long eventSequence) {
+        return ResponseEntity.ok(fcfsManageService.isParticipated(eventSequence, userInfo.getUserId()));
     }
 }

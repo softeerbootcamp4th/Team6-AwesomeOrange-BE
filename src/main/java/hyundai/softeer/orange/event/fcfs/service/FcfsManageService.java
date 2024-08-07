@@ -1,6 +1,7 @@
 package hyundai.softeer.orange.event.fcfs.service;
 
 import hyundai.softeer.orange.common.ErrorCode;
+import hyundai.softeer.orange.event.fcfs.dto.ResponseFcfsInfoDto;
 import hyundai.softeer.orange.event.fcfs.dto.ResponseFcfsWinnerDto;
 import hyundai.softeer.orange.event.fcfs.entity.FcfsEvent;
 import hyundai.softeer.orange.event.fcfs.entity.FcfsEventWinningInfo;
@@ -69,6 +70,38 @@ public class FcfsManageService {
         }
     }
 
+    // 특정 선착순 이벤트의 정보 조회
+    public ResponseFcfsInfoDto getFcfsInfo(Long eventSequence) {
+        String startTime = stringRedisTemplate.opsForValue().get(FcfsUtil.startTimeFormatting(eventSequence.toString()));
+        // 선착순 이벤트가 존재하지 않는 경우
+        if (startTime == null) {
+            throw new FcfsEventException(ErrorCode.FCFS_EVENT_NOT_FOUND);
+        }
+
+        LocalDateTime nowDateTime = LocalDateTime.now();
+        LocalDateTime eventStartTime = LocalDateTime.parse(startTime);
+
+        // 서버시간 < 이벤트시작시간 < 서버시간+3시간 -> countdown
+        // 이벤트시작시간 < 서버시간 < 이벤트시작시간+7시간 -> progress
+        // 그 외 -> waiting
+        if(nowDateTime.isBefore(eventStartTime) && nowDateTime.plusHours(3).isAfter(eventStartTime)) {
+            return new ResponseFcfsInfoDto(nowDateTime, "countdown");
+        } else if(eventStartTime.isBefore(nowDateTime) && eventStartTime.plusHours(7).isAfter(nowDateTime)) {
+            return new ResponseFcfsInfoDto(nowDateTime, "progress");
+        } else {
+            return new ResponseFcfsInfoDto(nowDateTime, "waiting");
+        }
+    }
+
+    // 특정 유저가 선착순 이벤트의 참여자인지 조회 (정답을 맞힌 경우 참여자로 간주)
+    @Transactional(readOnly = true)
+    public boolean isParticipated(Long eventSequence, String userId) {
+        if(!fcfsEventRepository.existsById(eventSequence)) {
+            throw new FcfsEventException(ErrorCode.FCFS_EVENT_NOT_FOUND);
+        }
+        return stringRedisTemplate.opsForZSet().rank(FcfsUtil.participantFormatting(eventSequence.toString()), userId) != null;
+    }
+
     // 특정 선착순 이벤트의 당첨자 조회 - 어드민에서 사용
     @Transactional(readOnly = true)
     public List<ResponseFcfsWinnerDto> getFcfsWinnersInfo(Long eventSequence) {
@@ -94,6 +127,8 @@ public class FcfsManageService {
 
     public void deleteEventInfo(String eventId) {
         stringRedisTemplate.delete(FcfsUtil.startTimeFormatting(eventId));
+        stringRedisTemplate.delete(FcfsUtil.answerFormatting(eventId));
+        stringRedisTemplate.delete(FcfsUtil.participantFormatting(eventId));
         stringRedisTemplate.delete(FcfsUtil.winnerFormatting(eventId));
         numberRedisTemplate.delete(FcfsUtil.keyFormatting(eventId));
         booleanRedisTemplate.delete(FcfsUtil.endFlagFormatting(eventId));

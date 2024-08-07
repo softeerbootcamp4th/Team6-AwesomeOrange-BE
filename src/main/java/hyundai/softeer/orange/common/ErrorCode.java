@@ -45,6 +45,7 @@ public enum ErrorCode {
     COMMENT_ALREADY_EXISTS(HttpStatus.CONFLICT, false, "이미 등록된 기대평입니다."),
     ADMIN_USER_ALREADY_EXISTS(HttpStatus.CONFLICT, false, "이미 존재하는 관리자입니다."),
     ALREADY_WINNER(HttpStatus.CONFLICT, false, "이미 당첨된 사용자입니다."),
+    ALREADY_PARTICIPATED(HttpStatus.CONFLICT, false, "이미 참여한 사용자입니다."),
     PHONE_NUMBER_ALREADY_EXISTS(HttpStatus.CONFLICT, false, "이미 존재하는 전화번호입니다."),
 
     // 500 Internal Server Error
