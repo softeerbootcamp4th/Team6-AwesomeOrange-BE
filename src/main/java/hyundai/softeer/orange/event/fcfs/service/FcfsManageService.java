@@ -1,6 +1,7 @@
 package hyundai.softeer.orange.event.fcfs.service;
 
 import hyundai.softeer.orange.common.ErrorCode;
+import hyundai.softeer.orange.common.util.ConstantUtil;
 import hyundai.softeer.orange.event.fcfs.dto.ResponseFcfsInfoDto;
 import hyundai.softeer.orange.event.fcfs.dto.ResponseFcfsWinnerDto;
 import hyundai.softeer.orange.event.fcfs.entity.FcfsEvent;
@@ -84,9 +85,9 @@ public class FcfsManageService {
         // 서버시간 < 이벤트시작시간 < 서버시간+3시간 -> countdown
         // 이벤트시작시간 < 서버시간 < 이벤트시작시간+7시간 -> progress
         // 그 외 -> waiting
-        if(nowDateTime.isBefore(eventStartTime) && nowDateTime.plusHours(3).isAfter(eventStartTime)) {
+        if(nowDateTime.isBefore(eventStartTime) && nowDateTime.plusHours(ConstantUtil.FCFS_COUNTDOWN_HOUR).isAfter(eventStartTime)) {
             return new ResponseFcfsInfoDto(nowDateTime, "countdown");
-        } else if(eventStartTime.isBefore(nowDateTime) && eventStartTime.plusHours(7).isAfter(nowDateTime)) {
+        } else if(eventStartTime.isBefore(nowDateTime) && eventStartTime.plusHours(ConstantUtil.FCFS_AVAILABLE_HOUR).isAfter(nowDateTime)) {
             return new ResponseFcfsInfoDto(nowDateTime, "progress");
         } else {
             return new ResponseFcfsInfoDto(nowDateTime, "waiting");

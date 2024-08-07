@@ -27,4 +27,6 @@ public class ConstantUtil {
     public static final int AUTH_CODE_LENGTH = 6;
     public static final int JWT_LIFESPAN = 1; // 1시간
     public static final int AUTH_CODE_EXPIRE_TIME = 5; // 5분
+    public static final int FCFS_AVAILABLE_HOUR = 7;
+    public static final int FCFS_COUNTDOWN_HOUR = 3;
 }
