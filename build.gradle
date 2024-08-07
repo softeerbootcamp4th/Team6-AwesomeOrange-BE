@@ -54,10 +54,6 @@ dependencies {
 	// mockito
 	testImplementation 'org.mockito:mockito-core:3.12.4'
 
-	// jackson
-	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
-	implementation 'com.fasterxml.jackson.core:jackson-databind'
-
 	//jwt
 	implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
 	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.6'
