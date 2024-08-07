@@ -2,10 +2,12 @@ package hyundai.softeer.orange.event.common.controller;
 
 import hyundai.softeer.orange.core.auth.Auth;
 import hyundai.softeer.orange.core.auth.AuthRole;
+import hyundai.softeer.orange.event.common.entity.EventMetadata;
 import hyundai.softeer.orange.event.common.service.EventService;
 import hyundai.softeer.orange.event.dto.BriefEventDto;
 import hyundai.softeer.orange.event.dto.EventDto;
 import hyundai.softeer.orange.event.dto.EventFrameCreateRequest;
+import hyundai.softeer.orange.event.dto.EventSearchHintDto;
 import hyundai.softeer.orange.event.dto.group.EventEditGroup;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -110,5 +112,14 @@ public class EventController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
+    @Auth({AuthRole.admin})
+    @GetMapping("/hints")
+    @Operation(summary="이벤트 힌트 목록 얻기", description = "관리자가 이벤트 댓글 열람을 위해 검색할 때 반환하는 (이벤트 id / 이름 ) 정보 목록을 얻는다.", responses = {
+            @ApiResponse(responseCode = "200", description = "이벤트 힌트 목록 획득")
+    })
+    public ResponseEntity<List<EventSearchHintDto>> findEventSearchHints(@RequestParam("search") String search) {
+        var searchHints = eventService.searchHints(search);
+        return ResponseEntity.ok(searchHints);
+    }
 
 }
