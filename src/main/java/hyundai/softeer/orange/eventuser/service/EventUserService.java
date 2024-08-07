@@ -77,7 +77,8 @@ public class EventUserService {
 
     // JWT 토큰 생성
     private TokenDto generateToken(EventUser eventUser) {
-        Map<String, Object> claims = Map.of(ConstantUtil.CLAIMS_USER_KEY, eventUser.getUserId(), ConstantUtil.CLAIMS_ROLE_KEY, AuthRole.event_user);
+        Map<String, Object> claims = Map.of(ConstantUtil.CLAIMS_USER_KEY, eventUser.getUserId(), ConstantUtil.CLAIMS_ROLE_KEY, AuthRole.event_user,
+                ConstantUtil.CLAIMS_USER_NAME_KEY, eventUser.getUserName());
         String token = jwtManager.generateToken(ConstantUtil.JWT_USER_KEY, claims, ConstantUtil.JWT_LIFESPAN);
         return new TokenDto(token);
     }

@@ -14,6 +14,7 @@ public class ConstantUtil {
     public static final String AUTH_CODE_CREATE_REGEX = "%06d";
     public static final String CLAIMS_USER_KEY = "userId";
     public static final String CLAIMS_ROLE_KEY = "role";
+    public static final String CLAIMS_USER_NAME_KEY = "userName";
     public static final String JWT_USER_KEY = "eventUser";
     public static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     public static final String LOCATION = "Location";
