@@ -1,6 +1,5 @@
 package hyundai.softeer.orange.comment;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hyundai.softeer.orange.comment.controller.CommentController;
 import hyundai.softeer.orange.comment.dto.CreateCommentDto;
@@ -12,7 +11,9 @@ import hyundai.softeer.orange.comment.service.CommentService;
 import hyundai.softeer.orange.common.ErrorCode;
 import hyundai.softeer.orange.common.ErrorResponse;
 import hyundai.softeer.orange.common.util.MessageUtil;
-import hyundai.softeer.orange.core.jwt.JWTManager;
+import hyundai.softeer.orange.core.auth.AuthInterceptor;
+import hyundai.softeer.orange.eventuser.component.EventUserArgumentResolver;
+import hyundai.softeer.orange.eventuser.dto.EventUserInfo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -49,15 +50,22 @@ class CommentControllerTest {
     private ApiService apiService;
 
     @MockBean
-    private JWTManager jwtManager;
+    private EventUserArgumentResolver eventUserArgumentResolver;
+
+    @MockBean
+    private AuthInterceptor authInterceptor;
 
     ObjectMapper mapper = new ObjectMapper();
-    CreateCommentDto createCommentDto = new CreateCommentDto(1L, 1L, "hello");
+    CreateCommentDto createCommentDto = new CreateCommentDto(1L, "hello");
     String requestBody = "";
 
     @BeforeEach
-    void setUp() throws JsonProcessingException {
+    void setUp() throws Exception {
+        EventUserInfo mockUserInfo = new EventUserInfo("testUserId", "event_user");
         requestBody = mapper.writeValueAsString(createCommentDto);
+        when(authInterceptor.preHandle(any(), any(), any())).thenReturn(true);
+        when(eventUserArgumentResolver.resolveArgument(any(), any(), any(), any()))
+                .thenReturn(mockUserInfo);
     }
 
     @DisplayName("getComments: 기대평 조회 API를 호출한다.")
@@ -99,7 +107,7 @@ class CommentControllerTest {
     void createComment200Test() throws Exception {
         // given
         when(apiService.analyzeComment(createCommentDto.getContent())).thenReturn(true);
-        when(commentService.createComment(any(CreateCommentDto.class), anyBoolean())).thenReturn(true);
+        when(commentService.createComment(any(), any(CreateCommentDto.class), anyBoolean())).thenReturn(true);
 
         // when & then
         mockMvc.perform(MockMvcRequestBuilders
@@ -116,7 +124,7 @@ class CommentControllerTest {
     void createComment400Test() throws Exception {
         // given
         when(apiService.analyzeComment(createCommentDto.getContent())).thenReturn(true);
-        when(commentService.createComment(any(CreateCommentDto.class), anyBoolean()))
+        when(commentService.createComment(any(), any(CreateCommentDto.class), anyBoolean()))
                 .thenThrow(new CommentException(ErrorCode.INVALID_COMMENT));
         String responseBody = mapper.writeValueAsString(ErrorResponse.from(ErrorCode.INVALID_COMMENT));
 
@@ -134,11 +142,10 @@ class CommentControllerTest {
     @Test
     void createComment400BadInputTest() throws Exception {
         // given
-        CreateCommentDto badInput = new CreateCommentDto(null, null, "");
+        CreateCommentDto badInput = new CreateCommentDto(null, "");
         requestBody = mapper.writeValueAsString(badInput);
 
         Map<String, String> expectedErrors = new HashMap<>();
-        expectedErrors.put("eventUserId", MessageUtil.BAD_INPUT);
         expectedErrors.put("eventFrameId", MessageUtil.BAD_INPUT);
         expectedErrors.put("content", MessageUtil.OUT_OF_SIZE);
         String responseBody = mapper.writeValueAsString(expectedErrors);
@@ -158,7 +165,7 @@ class CommentControllerTest {
     void createComment409Test() throws Exception {
         // given
         when(apiService.analyzeComment(createCommentDto.getContent())).thenReturn(true);
-        when(commentService.createComment(any(CreateCommentDto.class), anyBoolean()))
+        when(commentService.createComment(any(), any(CreateCommentDto.class), anyBoolean()))
                 .thenThrow(new CommentException(ErrorCode.COMMENT_ALREADY_EXISTS));
         String responseBody = mapper.writeValueAsString(ErrorResponse.from(ErrorCode.COMMENT_ALREADY_EXISTS));
 
