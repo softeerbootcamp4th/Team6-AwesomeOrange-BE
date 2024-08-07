@@ -66,7 +66,7 @@ public class EventUserService {
         // DB에 유저 데이터 저장
         EventFrame eventFrame = eventFrameRepository.findById(eventFrameId)
                 .orElseThrow(() -> new EventUserException(ErrorCode.EVENT_FRAME_NOT_FOUND));
-        String userId = UUID.randomUUID().toString().substring(0, 8);
+        String userId = UUID.randomUUID().toString().substring(0, ConstantUtil.USER_ID_LENGTH);
         EventUser eventUser = EventUser.of(dto.getName(), dto.getPhoneNumber(), eventFrame, userId);
         eventUserRepository.save(eventUser);
         return generateToken(eventUser);
@@ -75,7 +75,7 @@ public class EventUserService {
     // JWT 토큰 생성
     private TokenDto generateToken(EventUser eventUser) {
         Map<String, Object> claims = Map.of(ConstantUtil.CLAIMS_USER_KEY, eventUser.getUserId(), ConstantUtil.CLAIMS_ROLE_KEY, AuthRole.event_user);
-        String token = jwtManager.generateToken(ConstantUtil.JWT_USER_KEY, claims, 5);
+        String token = jwtManager.generateToken(ConstantUtil.JWT_USER_KEY, claims, ConstantUtil.JWT_LIFESPAN);
         return new TokenDto(token);
     }
 }
