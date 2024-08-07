@@ -150,6 +150,6 @@ class EventUserServiceTest {
         // when & then
         assertThatThrownBy(() -> eventUserService.checkAuthCode(requestAuthCodeDto, eventFrameId))
                 .isInstanceOf(EventUserException.class)
-                .hasMessage(ErrorCode.BAD_REQUEST.getMessage());
+                .hasMessage(ErrorCode.AUTH_CODE_EXPIRED.getMessage());
     }
 }
