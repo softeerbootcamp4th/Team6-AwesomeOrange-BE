@@ -22,4 +22,5 @@ public class ConstantUtil {
     public static final int COMMENTS_SIZE = 20;
     public static final int SCHEDULED_TIME = 1000 * 60 * 60 * 2;
     public static final int SHORT_URL_LENGTH = 10;
+    public static final int AUTH_CODE_LENGTH = 6;
 }
