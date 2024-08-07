@@ -5,7 +5,6 @@ import hyundai.softeer.orange.common.ErrorCode;
 import hyundai.softeer.orange.common.util.ConstantUtil;
 import hyundai.softeer.orange.core.jwt.JWTConst;
 import hyundai.softeer.orange.eventuser.dto.EventUserInfo;
-import hyundai.softeer.orange.eventuser.entity.EventUser;
 import hyundai.softeer.orange.eventuser.exception.EventUserException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
@@ -29,7 +28,7 @@ public class EventUserArgumentResolver implements HandlerMethodArgumentResolver 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
         boolean hasAnnotation = parameter.hasParameterAnnotation(EventUserAnnotation.class);
-        boolean hasType = EventUser.class.isAssignableFrom(parameter.getParameterType());
+        boolean hasType = EventUserInfo.class.isAssignableFrom(parameter.getParameterType());
         return hasAnnotation && hasType;
     }
 
@@ -39,8 +38,9 @@ public class EventUserArgumentResolver implements HandlerMethodArgumentResolver 
         HttpServletRequest request = (HttpServletRequest) webRequest.getNativeRequest();
         try {
             Jws<Claims> claims = (Jws<Claims>) request.getAttribute(JWTConst.Token);
-            Object data = claims.getPayload().get(ConstantUtil.JWT_USER_KEY);
-            return objectMapper.convertValue(data, EventUserInfo.class);
+            Object userId = claims.getPayload().get(ConstantUtil.CLAIMS_USER_KEY);
+            Object role = claims.getPayload().get(ConstantUtil.CLAIMS_ROLE_KEY);
+            return new EventUserInfo((String) userId, (String) role);
         } catch (Exception e) {
             throw new EventUserException(ErrorCode.UNAUTHORIZED);
         }
