@@ -3,6 +3,7 @@ package hyundai.softeer.orange.eventuser.entity;
 import hyundai.softeer.orange.comment.entity.Comment;
 import hyundai.softeer.orange.event.common.entity.EventFrame;
 import hyundai.softeer.orange.event.draw.entity.DrawEventWinningInfo;
+import hyundai.softeer.orange.event.draw.entity.EventParticipationInfo;
 import hyundai.softeer.orange.event.fcfs.entity.FcfsEventWinningInfo;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -39,6 +40,9 @@ public class EventUser {
 
     @OneToMany(mappedBy = "eventUser")
     private List<Comment> commentList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "eventUser")
+    private List<EventParticipationInfo> participationInfoList  = new ArrayList<>();
 
     @OneToMany(mappedBy = "eventUser")
     private List<DrawEventWinningInfo> drawEventWinningInfoList = new ArrayList<>();

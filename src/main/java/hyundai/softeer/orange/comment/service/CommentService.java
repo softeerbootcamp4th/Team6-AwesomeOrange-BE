@@ -15,6 +15,7 @@ import hyundai.softeer.orange.eventuser.repository.EventUserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,7 +25,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @Service
 public class CommentService {
-
     private final CommentRepository commentRepository;
     private final EventFrameRepository eventFrameRepository;
     private final EventUserRepository eventUserRepository;
@@ -67,5 +67,18 @@ public class CommentService {
 
         commentRepository.deleteById(commentId);
         return commentId;
+    }
+
+    @Transactional
+    public void deleteComments(List<Long> commentIds) {
+        commentRepository.deleteAllById(commentIds);
+    }
+
+    public ResponseCommentsDto searchComments(String eventId, Integer page, Integer size) {
+        PageRequest pageInfo = PageRequest.of(page, size);
+
+        var comments = commentRepository.findAllByEventId(eventId,pageInfo)
+                .getContent().stream().map(ResponseCommentDto::from).toList();
+        return new ResponseCommentsDto(comments);
     }
 }

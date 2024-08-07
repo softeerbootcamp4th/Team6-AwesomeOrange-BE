@@ -15,6 +15,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.TestPropertySource;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -86,12 +87,7 @@ public class EventServiceSearchEventsTest {
                 .eventFrame(ef)
                 .build();
 
-        emRepo.save(em1);
-        emRepo.save(em2);
-        emRepo.save(em3);
-        emRepo.save(em4);
-        emRepo.save(em5);
-        emRepo.save(em6);
+        emRepo.saveAll(List.of(em1,em2,em3,em4,em5,em6));
     }
 
     @DisplayName("search 없으면 모두 출력")
@@ -146,7 +142,6 @@ public class EventServiceSearchEventsTest {
     @DisplayName("여러 옵션 함께 사용도 가능")
     @Test
     void searchEvents_withMultipleOptions() {
-
         var list = eventService.searchEvents("25", "endTime:desc", 1, 1);
         BriefEventDto target = list.get(0);
 

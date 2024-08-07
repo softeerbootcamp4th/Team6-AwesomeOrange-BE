@@ -16,6 +16,7 @@ import hyundai.softeer.orange.event.common.repository.EventSpecification;
 import hyundai.softeer.orange.event.component.EventKeyGenerator;
 import hyundai.softeer.orange.event.dto.BriefEventDto;
 import hyundai.softeer.orange.event.dto.EventDto;
+import hyundai.softeer.orange.event.dto.EventSearchHintDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -152,26 +153,40 @@ public class EventService {
                     break;
             }
         }
+        // findBy를 이용하려면 Sort와 Page를 하나로 몰아넣으면 안된다.
         Sort sort = Sort.by(orders);
-
         PageRequest pageInfo = PageRequest.of(
                 page != null ? page : EventConst.EVENT_DEFAULT_PAGE,
-                size != null ? size : EventConst.EVENT_DEFAULT_SIZE,
-                sort
+                size != null ? size : EventConst.EVENT_DEFAULT_SIZE
         );
 
-        var withSearch = EventSpecification.withSearch(search);
-        Page<EventMetadata> eventPage = emRepository.findAll(withSearch, pageInfo);
-        List<EventMetadata> events = eventPage.getContent();
+        var searchOnName = EventSpecification.searchOnName(search);
+        var searchOnEventId = EventSpecification.searchOnEventId(search);
 
-        return events.stream().map(
-                it -> BriefEventDto.of(
-                        it.getEventId(),
-                        it.getName(),
-                        it.getStartTime(),
-                        it.getEndTime(),
-                        it.getEventType()
-                )).toList();
+        Page<BriefEventDto> eventPage = emRepository.findBy(
+                searchOnName.or(searchOnEventId),
+                (p) -> p.as(BriefEventDto.class)
+                        .sortBy(sort)
+                        .page(pageInfo)
+        );
+
+        return eventPage.getContent();
+    }
+
+    /**
+     * 이벤트 힌트 정보를 받는다. 관리자는 이벤트 힌트 정보를 기반으로 이벤트에 대한 추가적인 정보를 조회할 수 있다.
+     * @param search 이벤트 검색어
+     * @return 검색을 위한 힌트 정보 ( id, 이름 )
+     */
+    public List<EventSearchHintDto> searchHints(String search) {
+        var searchOnEventIdDefaultReject = EventSpecification.searchOnEventId(search, false);
+        var isDrawEvent = EventSpecification.isEventTypeOf(EventType.draw);
+        // 내부적으로는 모든 데이터를 fetch하는 문제가 여전히 존재.
+
+        return emRepository.findBy(
+                searchOnEventIdDefaultReject.and(isDrawEvent),
+                (q) -> q.as(EventSearchHintDto.class).all()
+        );
     }
 
     /**
