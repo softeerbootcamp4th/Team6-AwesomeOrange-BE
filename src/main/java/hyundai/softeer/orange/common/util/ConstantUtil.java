@@ -12,7 +12,9 @@ public class ConstantUtil {
     public static final String PHONE_NUMBER_REGEX = "010\\d{8}"; // 010 + 8자리 숫자
     public static final String AUTH_CODE_REGEX = "\\d{6}"; // 6자리 숫자
     public static final String AUTH_CODE_CREATE_REGEX = "%06d";
-    public static final String CLAIMS_KEY = "user";
+    public static final String CLAIMS_USER_KEY = "userId";
+    public static final String CLAIMS_ROLE_KEY = "role";
+    public static final String JWT_USER_KEY = "eventUser";
     public static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     public static final String LOCATION = "Location";
 
