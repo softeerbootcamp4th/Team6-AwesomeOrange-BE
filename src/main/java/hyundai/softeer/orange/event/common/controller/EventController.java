@@ -49,7 +49,8 @@ public class EventController {
             @RequestParam(required = false) String search,
             @RequestParam(required = false) String sort,
             @RequestParam(required = false) Integer page,
-            @RequestParam(required = false) Integer size) {
+            @RequestParam(required = false) Integer size
+    ) {
         List<BriefEventDto> events = eventService.searchEvents(search, sort, page, size);
         return ResponseEntity.ok(events);
     }
