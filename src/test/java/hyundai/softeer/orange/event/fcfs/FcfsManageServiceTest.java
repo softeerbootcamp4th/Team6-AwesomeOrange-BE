@@ -2,6 +2,7 @@ package hyundai.softeer.orange.event.fcfs;
 
 import hyundai.softeer.orange.event.common.entity.EventFrame;
 import hyundai.softeer.orange.event.common.repository.EventFrameRepository;
+import hyundai.softeer.orange.event.fcfs.dto.ResponseFcfsInfoDto;
 import hyundai.softeer.orange.event.fcfs.dto.ResponseFcfsWinnerDto;
 import hyundai.softeer.orange.event.fcfs.entity.FcfsEvent;
 import hyundai.softeer.orange.event.fcfs.entity.FcfsEventWinningInfo;
@@ -93,7 +94,7 @@ class FcfsManageServiceTest {
 
     @DisplayName("registerFcfsEvents: 오늘의 선착순 이벤트 정보(당첨자 수, 시작 시각)를 Redis에 배치")
     @Test
-    void registerFcfsEvents() {
+    void registerFcfsEventsTest() {
         // given
         List<FcfsEvent> events = fcfsEventRepository.findByStartTimeBetween(LocalDateTime.now(), LocalDateTime.now().plusDays(1));
         FcfsEvent fcfsEvent = events.get(0);
@@ -115,7 +116,7 @@ class FcfsManageServiceTest {
 
     @DisplayName("registerWinners: redis에 저장된 모든 선착순 이벤트의 당첨자 정보를 DB로 이관")
     @Test
-    void registerWinners() {
+    void registerWinnersTest() {
         // when
         fcfsManageService.registerFcfsEvents();
         for(int i=0; i<5; i++){
@@ -130,9 +131,35 @@ class FcfsManageServiceTest {
                 .contains("uuid0", "uuid1", "uuid2", "uuid3", "uuid4");
     }
 
+    @DisplayName("getFcfsInfo: 특정 선착순 이벤트의 정보 조회")
+    @Test
+    void getFcfsInfoTest() {
+        // when
+        stringRedisTemplate.opsForValue().set(FcfsUtil.startTimeFormatting(eventSequence.toString()), LocalDateTime.now().toString());
+        ResponseFcfsInfoDto fcfsInfo = fcfsManageService.getFcfsInfo(eventSequence);
+
+        // then
+        assertThat(fcfsInfo.getNowDateTime()).isNotNull();
+        assertThat(fcfsInfo.getEventStatus()).isEqualTo("progress");
+    }
+
+    @DisplayName("isParticipated: 특정 선착순 이벤트에 참여한 유저임을 확인한다.")
+    @Test
+    void isParticipatedTest() {
+        // given
+        EventUser eventUser = eventUserRepository.findByUserId("uuid0").get();
+        stringRedisTemplate.opsForSet().add(FcfsUtil.participantFormatting(eventSequence.toString()), eventUser.getUserId());
+
+        // when
+        boolean participated = fcfsManageService.isParticipated(eventSequence, eventUser.getUserId());
+
+        // then
+        assertThat(participated).isTrue();
+    }
+
     @DisplayName("getFcfsWinnersInfo: 특정 선착순 이벤트의 당첨자 조회 - 어드민에서 사용")
     @Test
-    void getFcfsWinnersInfo() {
+    void getFcfsWinnersInfoTest() {
         // when
         List<ResponseFcfsWinnerDto> fcfsWinnersInfo = fcfsManageService.getFcfsWinnersInfo(eventSequence);
 
@@ -142,4 +169,5 @@ class FcfsManageServiceTest {
                 .extracting("name")
                 .contains("test0", "test1", "test2", "test3", "test4");
     }
+
 }

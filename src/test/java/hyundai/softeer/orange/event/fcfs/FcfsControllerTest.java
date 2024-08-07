@@ -37,6 +37,9 @@ class FcfsControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
+    @Autowired
+    private ObjectMapper mapper;
+
     @MockBean
     private JpaMetamodelMappingContext jpaMetamodelMappingContext;
 
@@ -55,7 +58,6 @@ class FcfsControllerTest {
     @MockBean
     private AuthInterceptor authInterceptor;
 
-    ObjectMapper mapper = new ObjectMapper();
     String userId = "testUserId";
     String answer = "answer";
     Long eventSequence = 1L;
@@ -135,8 +137,9 @@ class FcfsControllerTest {
     @Test
     void getFcfsInfoTest() throws Exception {
         // given
-        when(fcfsManageService.getFcfsInfo(eventSequence)).thenReturn(new ResponseFcfsInfoDto(LocalDateTime.now(), "waiting"));
-        String responseBody = mapper.writeValueAsString(new ResponseFcfsInfoDto(LocalDateTime.now(), "waiting"));
+        ResponseFcfsInfoDto responseFcfsInfoDto = new ResponseFcfsInfoDto(LocalDateTime.now(), "waiting");
+        when(fcfsManageService.getFcfsInfo(eventSequence)).thenReturn(responseFcfsInfoDto);
+        String responseBody = mapper.writeValueAsString(responseFcfsInfoDto);
 
         // when & then
         mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/event/fcfs/{eventSequence}/info", eventSequence))
