@@ -10,10 +10,12 @@ import hyundai.softeer.orange.eventuser.exception.EventUserException;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,6 +33,15 @@ public class GlobalExceptionHandler {
             String errorMessage = error.getDefaultMessage();
             errors.put(fieldName, errorMessage);
         });
+        return ResponseEntity.badRequest().body(errors);
+    }
+
+    // TODO: messages.properties에 예외 메시지 커스터마이징할 수 있게 방법 찾아보기
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<Map<String, String>> handleInValidRequestException(MethodArgumentTypeMismatchException e) {
+        Map<String, String> errors = new HashMap<>();
+        errors.put(e.getName(), e.getLocalizedMessage());
         return ResponseEntity.badRequest().body(errors);
     }
 
