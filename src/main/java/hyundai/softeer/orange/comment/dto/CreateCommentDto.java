@@ -13,16 +13,12 @@ import lombok.NoArgsConstructor;
 public class CreateCommentDto {
 
     @NotNull(message = MessageUtil.BAD_INPUT)
-    private Long eventUserId;
-
-    @NotNull(message = MessageUtil.BAD_INPUT)
     private Long eventFrameId;
 
     @Size(min = 1, max = 100, message = MessageUtil.OUT_OF_SIZE)
     private String content;
 
-    public CreateCommentDto(Long eventUserId, Long eventFrameId, String content) {
-        this.eventUserId = eventUserId;
+    public CreateCommentDto(Long eventFrameId, String content) {
         this.eventFrameId = eventFrameId;
         this.content = content;
     }

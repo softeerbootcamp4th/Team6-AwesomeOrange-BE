@@ -3,6 +3,7 @@ package hyundai.softeer.orange.eventuser.service;
 import hyundai.softeer.orange.common.ErrorCode;
 import hyundai.softeer.orange.common.dto.TokenDto;
 import hyundai.softeer.orange.common.util.ConstantUtil;
+import hyundai.softeer.orange.core.auth.AuthRole;
 import hyundai.softeer.orange.core.jwt.JWTManager;
 import hyundai.softeer.orange.event.common.entity.EventFrame;
 import hyundai.softeer.orange.event.common.repository.EventFrameRepository;
@@ -16,7 +17,6 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -39,9 +39,7 @@ public class EventUserService {
         EventUser eventUser = eventUserRepository.findByUserNameAndPhoneNumber(dto.getName(), dto.getPhoneNumber())
                 .orElseThrow(() -> new EventUserException(ErrorCode.EVENT_USER_NOT_FOUND));
 
-        Map<String, Object> claims = new HashMap<>(Map.of(ConstantUtil.CLAIMS_KEY, eventUser.getUserId()));
-        String token = jwtManager.generateToken(eventUser.getUserName(), claims, 1);
-        return new TokenDto(token);
+        return generateToken(eventUser);
     }
 
     /**
@@ -54,10 +52,13 @@ public class EventUserService {
     public TokenDto checkAuthCode(RequestAuthCodeDto dto, Long eventFrameId) {
         // Redis에서 인증번호 조회
         String authCode = stringRedisTemplate.opsForValue().get(dto.getPhoneNumber());
+
+        // 해당 전화번호로 발송된 인증번호가 없거나 만료된 경우
         if(authCode == null) {
-            throw new EventUserException(ErrorCode.BAD_REQUEST);
+            throw new EventUserException(ErrorCode.AUTH_CODE_EXPIRED);
         }
 
+        // 인증번호가 틀린 경우
         if (!authCode.equals(dto.getAuthCode())) {
             throw new EventUserException(ErrorCode.INVALID_AUTH_CODE);
         }
@@ -68,7 +69,7 @@ public class EventUserService {
         // DB에 유저 데이터 저장
         EventFrame eventFrame = eventFrameRepository.findById(eventFrameId)
                 .orElseThrow(() -> new EventUserException(ErrorCode.EVENT_FRAME_NOT_FOUND));
-        String userId = UUID.randomUUID().toString().substring(0, 8);
+        String userId = UUID.randomUUID().toString().substring(0, ConstantUtil.USER_ID_LENGTH);
         EventUser eventUser = EventUser.of(dto.getName(), dto.getPhoneNumber(), eventFrame, userId);
         eventUserRepository.save(eventUser);
         return generateToken(eventUser);
@@ -76,8 +77,9 @@ public class EventUserService {
 
     // JWT 토큰 생성
     private TokenDto generateToken(EventUser eventUser) {
-        Map<String, Object> claims = new HashMap<>(Map.of(ConstantUtil.CLAIMS_KEY, eventUser.getUserId()));
-        String token = jwtManager.generateToken(eventUser.getUserName(), claims, 1);
+        Map<String, Object> claims = Map.of(ConstantUtil.CLAIMS_USER_KEY, eventUser.getUserId(), ConstantUtil.CLAIMS_ROLE_KEY, AuthRole.event_user,
+                ConstantUtil.CLAIMS_USER_NAME_KEY, eventUser.getUserName());
+        String token = jwtManager.generateToken(ConstantUtil.JWT_USER_KEY, claims, ConstantUtil.JWT_LIFESPAN);
         return new TokenDto(token);
     }
 }

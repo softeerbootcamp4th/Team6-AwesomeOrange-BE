@@ -5,12 +5,14 @@ import hyundai.softeer.orange.core.jwt.JWTConst;
 import hyundai.softeer.orange.core.jwt.JWTManager;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import java.util.*;
 
+@Slf4j
 @Component // 문제 있으면 변경
 public class AuthInterceptor implements HandlerInterceptor {
     private final JWTManager jwtManager;
@@ -21,6 +23,11 @@ public class AuthInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        // 유효하지 않은 요청은 정적 리소스로 간주하여 ResourceHttpRequestHandler가 대신 처리하기에, HandlerMethod가 아닌 경우는 무시
+        if (!(handler instanceof HandlerMethod)) {
+            return true;
+        }
+
         HandlerMethod handlerMethod = (HandlerMethod) handler;
 
         Auth classAnnotation = handlerMethod.getClass().getAnnotation(Auth.class);

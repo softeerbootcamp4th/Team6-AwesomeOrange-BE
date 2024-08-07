@@ -48,7 +48,6 @@ class CommentServiceTest {
 
     Long commentId = 1L;
     CreateCommentDto createCommentDto = CreateCommentDto.builder()
-            .eventUserId(1L)
             .eventFrameId(1L)
             .content("test")
             .build();
@@ -89,19 +88,19 @@ class CommentServiceTest {
     @Test
     void createCommentTest() {
         // given
-        given(commentRepository.existsByCreatedDateAndEventUser(createCommentDto.getEventUserId())).willReturn(false);
+        given(commentRepository.existsByCreatedDateAndEventUser(any())).willReturn(false);
         given(eventFrameRepository.findById(createCommentDto.getEventFrameId())).willReturn(Optional.of(EventFrame.of("eventFrame")));
-        given(eventUserRepository.findById(createCommentDto.getEventUserId())).willReturn(Optional.ofNullable(eventUser));
+        given(eventUserRepository.findByUserId(eventUser.getUserId())).willReturn(Optional.ofNullable(eventUser));
         given(commentRepository.save(any())).willReturn(Comment.of("test", eventFrame, eventUser, true));
 
         // when
-        commentService.createComment(createCommentDto, true);
+        commentService.createComment(eventUser.getUserId(), createCommentDto, true);
 
         // then
         verify(commentRepository, times(1)).save(any());
-        verify(commentRepository, times(1)).existsByCreatedDateAndEventUser(createCommentDto.getEventUserId());
+        verify(commentRepository, times(1)).existsByCreatedDateAndEventUser(any());
         verify(eventFrameRepository, times(1)).findById(createCommentDto.getEventFrameId());
-        verify(eventUserRepository, times(1)).findById(createCommentDto.getEventUserId());
+        verify(eventUserRepository, times(1)).findByUserId(eventUser.getUserId());
         verify(commentRepository, times(1)).save(any());
     }
 
@@ -109,10 +108,12 @@ class CommentServiceTest {
     @Test
     void createCommentAlreadyExistsTest() {
         // given
-        given(commentRepository.existsByCreatedDateAndEventUser(createCommentDto.getEventUserId())).willReturn(true);
+        given(eventFrameRepository.findById(createCommentDto.getEventFrameId())).willReturn(Optional.of(eventFrame));
+        given(eventUserRepository.findByUserId(eventUser.getUserId())).willReturn(Optional.of(eventUser));
+        given(commentRepository.existsByCreatedDateAndEventUser(any())).willReturn(true);
 
         // when
-        assertThatThrownBy(() -> commentService.createComment(createCommentDto, true))
+        assertThatThrownBy(() -> commentService.createComment(eventUser.getUserId(), createCommentDto, true))
                 .isInstanceOf(CommentException.class)
                 .hasMessage(ErrorCode.COMMENT_ALREADY_EXISTS.getMessage());
     }
@@ -121,11 +122,11 @@ class CommentServiceTest {
     @Test
     void createCommentFrameNotFoundTest() {
         // given
-        given(commentRepository.existsByCreatedDateAndEventUser(createCommentDto.getEventUserId())).willReturn(false);
+        given(eventUserRepository.findByUserId(eventUser.getUserId())).willReturn(Optional.ofNullable(eventUser));
         given(eventFrameRepository.findById(createCommentDto.getEventFrameId())).willReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> commentService.createComment(createCommentDto, true))
+        assertThatThrownBy(() -> commentService.createComment(eventUser.getUserId(), createCommentDto, true))
                 .isInstanceOf(CommentException.class)
                 .hasMessage(ErrorCode.EVENT_FRAME_NOT_FOUND.getMessage());
     }
@@ -134,12 +135,10 @@ class CommentServiceTest {
     @Test
     void createCommentUserNotFoundTest() {
         // given
-        given(commentRepository.existsByCreatedDateAndEventUser(createCommentDto.getEventUserId())).willReturn(false);
-        given(eventFrameRepository.findById(createCommentDto.getEventFrameId())).willReturn(Optional.of(EventFrame.of("eventFrame")));
-        given(eventUserRepository.findById(createCommentDto.getEventUserId())).willReturn(Optional.empty());
+        given(eventUserRepository.findByUserId(eventUser.getUserId())).willReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> commentService.createComment(createCommentDto, true))
+        assertThatThrownBy(() -> commentService.createComment(eventUser.getUserId(), createCommentDto, true))
                 .isInstanceOf(CommentException.class)
                 .hasMessage(ErrorCode.EVENT_USER_NOT_FOUND.getMessage());
     }

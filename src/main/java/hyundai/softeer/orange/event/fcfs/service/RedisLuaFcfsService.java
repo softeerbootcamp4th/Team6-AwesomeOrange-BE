@@ -26,12 +26,13 @@ public class RedisLuaFcfsService implements FcfsService {
     public boolean participate(Long eventSequence, String userId) {
         String fcfsId = FcfsUtil.keyFormatting(eventSequence.toString());
         if (isEventEnded(fcfsId)) {
+            stringRedisTemplate.opsForSet().add(FcfsUtil.participantFormatting(eventSequence.toString()), userId);
             return false;
         }
 
-        // 이미 당첨된 사용자인지 확인
-        if(stringRedisTemplate.opsForZSet().rank(FcfsUtil.winnerFormatting(eventSequence.toString()), userId) != null){
-            throw new FcfsEventException(ErrorCode.ALREADY_WINNER);
+        // 이미 선착순 이벤트에 참여한 사용자인지 확인 (참여했다면 이미 성공, 실패 결론은 고정되었기 때문)
+        if(isParticipated(eventSequence, userId)) {
+            throw new FcfsEventException(ErrorCode.ALREADY_PARTICIPATED);
         }
 
         // 잘못된 이벤트 참여 시간
@@ -61,13 +62,19 @@ public class RedisLuaFcfsService implements FcfsService {
         );
 
         if(result == null || result <= 0) {
+            stringRedisTemplate.opsForSet().add(FcfsUtil.participantFormatting(eventSequence.toString()), userId);
             endEvent(fcfsId);  // 이벤트 종료 플래그 설정
             return false;
         }
 
         stringRedisTemplate.opsForZSet().add(FcfsUtil.winnerFormatting(eventSequence.toString()), userId, System.currentTimeMillis());
+        stringRedisTemplate.opsForSet().add(FcfsUtil.participantFormatting(eventSequence.toString()), userId);
         log.info("Event Sequence: {}, User ID: {}, Timestamp: {}", eventSequence, userId, timestamp);
         return true;
+    }
+
+    public boolean isParticipated(Long eventSequence, String userId) {
+        return Boolean.TRUE.equals(stringRedisTemplate.opsForSet().isMember(FcfsUtil.participantFormatting(eventSequence.toString()), userId));
     }
 
     private boolean isEventEnded(String fcfsId) {

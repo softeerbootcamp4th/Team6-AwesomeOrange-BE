@@ -42,20 +42,29 @@ public class CommentService {
 
     // 신규 기대평을 등록한다.
     @Transactional
-    public Boolean createComment(CreateCommentDto dto, Boolean isPositive) {
+    public Boolean createComment(String userId, CreateCommentDto dto, Boolean isPositive) {
+        EventUser eventUser = eventUserRepository.findByUserId(userId)
+                .orElseThrow(() -> new CommentException(ErrorCode.EVENT_USER_NOT_FOUND));
+        EventFrame eventFrame = eventFrameRepository.findById(dto.getEventFrameId())
+                .orElseThrow(() -> new CommentException(ErrorCode.EVENT_FRAME_NOT_FOUND));
+
         // 하루에 여러 번의 기대평을 작성하려 할 때 예외처리
-        if(commentRepository.existsByCreatedDateAndEventUser(dto.getEventUserId())) {
+        if(commentRepository.existsByCreatedDateAndEventUser(eventUser.getId())) {
             throw new CommentException(ErrorCode.COMMENT_ALREADY_EXISTS);
         }
 
-        EventFrame eventFrame = eventFrameRepository.findById(dto.getEventFrameId())
-                .orElseThrow(() -> new CommentException(ErrorCode.EVENT_FRAME_NOT_FOUND));
-        EventUser eventUser = eventUserRepository.findById(dto.getEventUserId())
-                .orElseThrow(() -> new CommentException(ErrorCode.EVENT_USER_NOT_FOUND));
         // TODO: 점수정책와 연계하여 기대평 등록 시 점수를 부여 추가해야함
         Comment comment = Comment.of(dto.getContent(), eventFrame, eventUser, isPositive);
         commentRepository.save(comment);
         return true;
+    }
+
+    // 오늘 이 유저가 기대평을 작성할 수 있는지 여부를 조회한다.
+    @Transactional(readOnly = true)
+    public Boolean isCommentable(String userId) {
+        EventUser eventUser = eventUserRepository.findByUserId(userId)
+                .orElseThrow(() -> new CommentException(ErrorCode.EVENT_USER_NOT_FOUND));
+        return !commentRepository.existsByCreatedDateAndEventUser(eventUser.getId());
     }
 
     // 기대평을 삭제한다. 이 동작을 실행하는 주체가 어드민임이 반드시 검증되어야 한다.

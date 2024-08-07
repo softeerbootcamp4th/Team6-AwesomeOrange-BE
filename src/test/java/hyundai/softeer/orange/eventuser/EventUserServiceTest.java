@@ -2,6 +2,7 @@ package hyundai.softeer.orange.eventuser;
 
 import hyundai.softeer.orange.common.ErrorCode;
 import hyundai.softeer.orange.common.dto.TokenDto;
+import hyundai.softeer.orange.common.util.ConstantUtil;
 import hyundai.softeer.orange.core.jwt.JWTManager;
 import hyundai.softeer.orange.event.common.entity.EventFrame;
 import hyundai.softeer.orange.event.common.repository.EventFrameRepository;
@@ -99,7 +100,7 @@ class EventUserServiceTest {
         // given
         given(stringRedisTemplate.opsForValue().get(eventUser.getPhoneNumber())).willReturn(authCode);
         given(eventFrameRepository.findById(any())).willReturn(Optional.of(eventFrame));
-        given(jwtManager.generateToken(anyString(), anyMap(), eq(1)))
+        given(jwtManager.generateToken(anyString(), anyMap(), eq(ConstantUtil.JWT_LIFESPAN)))
                 .willReturn(tokenDto.token());
         RequestAuthCodeDto requestAuthCodeDto = RequestAuthCodeDto.builder()
                 .name(eventUser.getUserName())
@@ -149,6 +150,6 @@ class EventUserServiceTest {
         // when & then
         assertThatThrownBy(() -> eventUserService.checkAuthCode(requestAuthCodeDto, eventFrameId))
                 .isInstanceOf(EventUserException.class)
-                .hasMessage(ErrorCode.BAD_REQUEST.getMessage());
+                .hasMessage(ErrorCode.AUTH_CODE_EXPIRED.getMessage());
     }
 }

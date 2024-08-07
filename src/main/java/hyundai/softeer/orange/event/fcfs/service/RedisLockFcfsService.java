@@ -31,11 +31,12 @@ public class RedisLockFcfsService implements FcfsService {
         String fcfsId = FcfsUtil.keyFormatting(eventSequence.toString());
         // 불필요한 Lock 접근을 막기 위한 종료 flag 확인
         if (isEventEnded(fcfsId)) {
+            stringRedisTemplate.opsForSet().add(FcfsUtil.participantFormatting(eventSequence.toString()), userId);
             return false;
         }
 
         // 이미 당첨된 사용자인지 확인
-        if(stringRedisTemplate.opsForZSet().rank(FcfsUtil.winnerFormatting(eventSequence.toString()), userId) != null){
+        if(stringRedisTemplate.opsForSet().isMember(FcfsUtil.winnerFormatting(eventSequence.toString()), userId) != null) {
             throw new FcfsEventException(ErrorCode.ALREADY_WINNER);
         }
 
@@ -65,6 +66,7 @@ public class RedisLockFcfsService implements FcfsService {
 
             numberRedisTemplate.opsForValue().decrement(fcfsId);
             stringRedisTemplate.opsForZSet().add(FcfsUtil.winnerFormatting(eventSequence.toString()), userId, System.currentTimeMillis());
+            stringRedisTemplate.opsForSet().add(FcfsUtil.participantFormatting(eventSequence.toString()), userId);
             log.info("{} - 이벤트 참여 성공, 잔여 쿠폰: {}", userId, availableCoupons(fcfsId));
             return true;
         } catch (InterruptedException e) {
