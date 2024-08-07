@@ -59,6 +59,14 @@ public class CommentService {
         return true;
     }
 
+    // 오늘 이 유저가 기대평을 작성할 수 있는지 여부를 조회한다.
+    @Transactional(readOnly = true)
+    public Boolean isCommentable(String userId) {
+        EventUser eventUser = eventUserRepository.findByUserId(userId)
+                .orElseThrow(() -> new CommentException(ErrorCode.EVENT_USER_NOT_FOUND));
+        return !commentRepository.existsByCreatedDateAndEventUser(eventUser.getId());
+    }
+
     // 기대평을 삭제한다. 이 동작을 실행하는 주체가 어드민임이 반드시 검증되어야 한다.
     @Transactional
     public Long deleteComment(Long commentId) {

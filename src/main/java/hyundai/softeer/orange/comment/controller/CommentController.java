@@ -55,4 +55,15 @@ public class CommentController {
         boolean isPositive = apiService.analyzeComment(dto.getContent());
         return ResponseEntity.ok(commentService.createComment(userInfo.getUserId(), dto, isPositive));
     }
+
+    @Auth(AuthRole.event_user)
+    @Tag(name = "Comment")
+    @GetMapping("/info")
+    @Operation(summary = "기대평 등록 가능 여부 조회", description = "오늘 기대평 등록 가능 여부를 조회한다.", responses = {
+            @ApiResponse(responseCode = "200", description = "기대평 작성 가능 여부를 true/false로 반환한다.",
+                    content = @Content(schema = @Schema(implementation = Boolean.class)))
+    })
+    public ResponseEntity<Boolean> isCommentable(@EventUserAnnotation EventUserInfo userInfo) {
+        return ResponseEntity.ok(commentService.isCommentable(userInfo.getUserId()));
+    }
 }
