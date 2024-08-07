@@ -153,28 +153,24 @@ public class EventService {
                     break;
             }
         }
+        // findBy를 이용하려면 Sort와 Page를 하나로 몰아넣으면 안된다.
         Sort sort = Sort.by(orders);
-
         PageRequest pageInfo = PageRequest.of(
                 page != null ? page : EventConst.EVENT_DEFAULT_PAGE,
-                size != null ? size : EventConst.EVENT_DEFAULT_SIZE,
-                sort
+                size != null ? size : EventConst.EVENT_DEFAULT_SIZE
         );
 
         var searchOnName = EventSpecification.searchOnName(search);
         var searchOnEventId = EventSpecification.searchOnEventId(search);
-        Page<EventMetadata> eventPage = emRepository.findAll(searchOnName.or(searchOnEventId), pageInfo);
-        List<EventMetadata> events = eventPage.getContent();
 
-        // 가능하면 필요하지 않은 데이터는 fetch 하지 않도록 개선해보기
-        return events.stream().map(
-                it -> BriefEventDto.of(
-                        it.getEventId(),
-                        it.getName(),
-                        it.getStartTime(),
-                        it.getEndTime(),
-                        it.getEventType()
-                )).toList();
+        Page<BriefEventDto> eventPage = emRepository.findBy(
+                searchOnName.or(searchOnEventId),
+                (p) -> p.as(BriefEventDto.class)
+                        .sortBy(sort)
+                        .page(pageInfo)
+        );
+
+        return eventPage.getContent();
     }
 
     /**
@@ -185,13 +181,12 @@ public class EventService {
     public List<EventSearchHintDto> searchHints(String search) {
         var searchOnEventIdDefaultReject = EventSpecification.searchOnEventId(search, false);
         var isDrawEvent = EventSpecification.isEventTypeOf(EventType.draw);
-        List<EventMetadata> events = emRepository.findAll(searchOnEventIdDefaultReject.and(isDrawEvent));
+        // 내부적으로는 모든 데이터를 fetch하는 문제가 여전히 존재.
 
-        // 가능하면 필요하지 않은 데이터는 fetch 하지 않도록 개선해보기
-        return events.stream().map(it -> EventSearchHintDto.of(
-                it.getEventId(),
-                it.getName()
-        )).toList();
+        return emRepository.findBy(
+                searchOnEventIdDefaultReject.and(isDrawEvent),
+                (q) -> q.as(EventSearchHintDto.class).all()
+        );
     }
 
     /**

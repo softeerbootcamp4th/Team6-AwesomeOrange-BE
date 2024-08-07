@@ -146,7 +146,6 @@ public class EventServiceSearchEventsTest {
     @DisplayName("여러 옵션 함께 사용도 가능")
     @Test
     void searchEvents_withMultipleOptions() {
-
         var list = eventService.searchEvents("25", "endTime:desc", 1, 1);
         BriefEventDto target = list.get(0);
 
