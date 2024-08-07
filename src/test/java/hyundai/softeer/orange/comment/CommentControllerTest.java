@@ -13,9 +13,12 @@ import hyundai.softeer.orange.common.ErrorResponse;
 import hyundai.softeer.orange.common.util.MessageUtil;
 import hyundai.softeer.orange.core.auth.AuthInterceptor;
 import hyundai.softeer.orange.eventuser.component.EventUserArgumentResolver;
+import hyundai.softeer.orange.eventuser.dto.EventUserInfo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -60,8 +63,11 @@ class CommentControllerTest {
 
     @BeforeEach
     void setUp() throws Exception {
+        EventUserInfo eventUserInfo = new EventUserInfo("testUserId", "eventUser");
         requestBody = mapper.writeValueAsString(createCommentDto);
         when(authInterceptor.preHandle(any(), any(), any())).thenReturn(true);
+        when(eventUserArgumentResolver.supportsParameter(any())).thenReturn(true);
+        when(eventUserArgumentResolver.resolveArgument(any(), any(), any(), any())).thenReturn(eventUserInfo);
     }
 
     @DisplayName("getComments: 기대평 조회 API를 호출한다.")
@@ -156,6 +162,25 @@ class CommentControllerTest {
                 .andExpect(content().json(responseBody));
     }
 
+    @DisplayName("createComment: 기대평 등록 API를 호출 시 해당 정보를 갖는 유저나 이벤트가 존재하지 않아 실패한다.")
+    @Test
+    void createComment404Test() throws Exception {
+        // given
+        when(apiService.analyzeComment(createCommentDto.getContent())).thenReturn(true);
+        when(commentService.createComment(any(), any(CreateCommentDto.class), anyBoolean()))
+                .thenThrow(new CommentException(ErrorCode.EVENT_USER_NOT_FOUND));
+        String responseBody = mapper.writeValueAsString(ErrorResponse.from(ErrorCode.EVENT_USER_NOT_FOUND));
+
+        // when & then
+        mockMvc.perform(MockMvcRequestBuilders
+                        .post("/api/v1/comment")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(content().json(responseBody));
+    }
+
     @DisplayName("createComment: 기대평 등록 API를 호출 시 기대평 중복 작성으로 인해 실패한다.")
     @Test
     void createComment409Test() throws Exception {
@@ -172,6 +197,35 @@ class CommentControllerTest {
                         .content(requestBody)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isConflict())
+                .andExpect(content().json(responseBody));
+    }
+
+    @DisplayName("isCommentable: 기대평 등록 가능 여부를 조회한다.")
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void isCommentable200Test(boolean isCommentable) throws Exception {
+        // given
+        when(commentService.isCommentable(any())).thenReturn(isCommentable);
+
+        // when & then
+        mockMvc.perform(MockMvcRequestBuilders
+                        .get("/api/v1/comment/info"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(isCommentable ? "true" : "false"));
+    }
+
+    @DisplayName("isCommentable: 기대평 등록 가능 여부 조회 시 해당 정보를 갖는 유저가 존재하지 않아 실패한다.")
+    @Test
+    void isCommentable404Test() throws Exception {
+        // given
+        when(commentService.isCommentable(any()))
+                .thenThrow(new CommentException(ErrorCode.EVENT_USER_NOT_FOUND));
+        String responseBody = mapper.writeValueAsString(ErrorResponse.from(ErrorCode.EVENT_USER_NOT_FOUND));
+
+        // when & then
+        mockMvc.perform(MockMvcRequestBuilders
+                        .get("/api/v1/comment/info"))
+                .andExpect(status().isNotFound())
                 .andExpect(content().json(responseBody));
     }
 }
