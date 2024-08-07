@@ -3,6 +3,7 @@ package hyundai.softeer.orange.eventuser.service;
 import hyundai.softeer.orange.common.ErrorCode;
 import hyundai.softeer.orange.common.dto.TokenDto;
 import hyundai.softeer.orange.common.util.ConstantUtil;
+import hyundai.softeer.orange.core.auth.AuthRole;
 import hyundai.softeer.orange.core.jwt.JWTManager;
 import hyundai.softeer.orange.event.common.entity.EventFrame;
 import hyundai.softeer.orange.event.common.repository.EventFrameRepository;
@@ -16,7 +17,6 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -39,9 +39,7 @@ public class EventUserService {
         EventUser eventUser = eventUserRepository.findByUserNameAndPhoneNumber(dto.getName(), dto.getPhoneNumber())
                 .orElseThrow(() -> new EventUserException(ErrorCode.EVENT_USER_NOT_FOUND));
 
-        Map<String, Object> claims = new HashMap<>(Map.of(ConstantUtil.CLAIMS_KEY, eventUser.getUserId()));
-        String token = jwtManager.generateToken(eventUser.getUserName(), claims, 1);
-        return new TokenDto(token);
+        return generateToken(eventUser);
     }
 
     /**
@@ -76,8 +74,8 @@ public class EventUserService {
 
     // JWT 토큰 생성
     private TokenDto generateToken(EventUser eventUser) {
-        Map<String, Object> claims = new HashMap<>(Map.of(ConstantUtil.CLAIMS_KEY, eventUser.getUserId()));
-        String token = jwtManager.generateToken(eventUser.getUserName(), claims, 1);
+        Map<String, Object> claims = Map.of(ConstantUtil.CLAIMS_USER_KEY, eventUser.getUserId(), ConstantUtil.CLAIMS_ROLE_KEY, AuthRole.event_user);
+        String token = jwtManager.generateToken(ConstantUtil.JWT_USER_KEY, claims, 5);
         return new TokenDto(token);
     }
 }
