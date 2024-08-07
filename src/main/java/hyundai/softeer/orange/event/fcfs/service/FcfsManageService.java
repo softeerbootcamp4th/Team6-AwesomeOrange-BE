@@ -95,11 +95,11 @@ public class FcfsManageService {
 
     // 특정 유저가 선착순 이벤트의 참여자인지 조회 (정답을 맞힌 경우 참여자로 간주)
     @Transactional(readOnly = true)
-    public boolean isParticipated(Long eventSequence, String userId) {
+    public Boolean isParticipated(Long eventSequence, String userId) {
         if(!fcfsEventRepository.existsById(eventSequence)) {
             throw new FcfsEventException(ErrorCode.FCFS_EVENT_NOT_FOUND);
         }
-        return stringRedisTemplate.opsForZSet().rank(FcfsUtil.participantFormatting(eventSequence.toString()), userId) != null;
+        return Boolean.TRUE.equals(stringRedisTemplate.opsForSet().isMember(FcfsUtil.participantFormatting(eventSequence.toString()), userId));
     }
 
     // 특정 선착순 이벤트의 당첨자 조회 - 어드민에서 사용
