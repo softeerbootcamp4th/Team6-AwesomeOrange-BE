@@ -27,11 +27,12 @@ public class RedisSetFcfsService implements FcfsService {
 
         // 인원 마감 여부 확인
         if (isEventEnd(eventSequence)) {
+            stringRedisTemplate.opsForSet().add(FcfsUtil.participantFormatting(eventSequence.toString()), userId);
             return false;
         }
 
-        // 대기열에 등록
         stringRedisTemplate.opsForZSet().add(FcfsUtil.winnerFormatting(eventSequence.toString()), userId, System.currentTimeMillis());
+        stringRedisTemplate.opsForSet().add(FcfsUtil.participantFormatting(eventSequence.toString()), userId);
         log.info("{} 선착순 이벤트 참여 성공", userId);
         return true;
     }
