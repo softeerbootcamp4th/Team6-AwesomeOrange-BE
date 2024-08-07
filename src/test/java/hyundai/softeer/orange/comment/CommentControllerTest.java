@@ -13,7 +13,6 @@ import hyundai.softeer.orange.common.ErrorResponse;
 import hyundai.softeer.orange.common.util.MessageUtil;
 import hyundai.softeer.orange.core.auth.AuthInterceptor;
 import hyundai.softeer.orange.eventuser.component.EventUserArgumentResolver;
-import hyundai.softeer.orange.eventuser.dto.EventUserInfo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -61,11 +60,8 @@ class CommentControllerTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        EventUserInfo mockUserInfo = new EventUserInfo("testUserId", "event_user");
         requestBody = mapper.writeValueAsString(createCommentDto);
         when(authInterceptor.preHandle(any(), any(), any())).thenReturn(true);
-        when(eventUserArgumentResolver.resolveArgument(any(), any(), any(), any()))
-                .thenReturn(mockUserInfo);
     }
 
     @DisplayName("getComments: 기대평 조회 API를 호출한다.")
