@@ -3,6 +3,7 @@ package hyundai.softeer.orange.event.fcfs.controller;
 import hyundai.softeer.orange.common.ErrorResponse;
 import hyundai.softeer.orange.core.auth.Auth;
 import hyundai.softeer.orange.core.auth.AuthRole;
+import hyundai.softeer.orange.event.fcfs.dto.ResponseFcfsInfoDto;
 import hyundai.softeer.orange.event.fcfs.dto.ResponseFcfsResultDto;
 import hyundai.softeer.orange.event.fcfs.service.FcfsAnswerService;
 import hyundai.softeer.orange.event.fcfs.service.FcfsService;
@@ -39,5 +40,17 @@ public class FcfsController {
         boolean answerResult = fcfsAnswerService.judgeAnswer(eventSequence, eventAnswer);
         boolean isWin = answerResult && fcfsService.participate(eventSequence, userInfo.getUserId());
         return ResponseEntity.ok(new ResponseFcfsResultDto(answerResult, isWin));
+    }
+
+    @Tag(name = "fcfs")
+    @GetMapping("/{eventSequence}/info")
+    @Operation(summary = "특정 선착순 이벤트의 정보 조회", description = "특정 선착순 이벤트에 대한 정보(서버 기준 시각, 이벤트의 상태)를 반환한다.", responses = {
+            @ApiResponse(responseCode = "200", description = "선착순 이벤트 참여 가능 시간",
+                    content = @Content(schema = @Schema(implementation = ResponseFcfsInfoDto.class))),
+            @ApiResponse(responseCode = "404", description = "선착순 이벤트를 찾을 수 없는 경우",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    public ResponseEntity<ResponseFcfsInfoDto> getFcfsInfo(@PathVariable Long eventSequence) {
+        return ResponseEntity.ok(fcfsAnswerService.getFcfsInfo(eventSequence));
     }
 }
