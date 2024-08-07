@@ -12,6 +12,8 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.test.context.TestPropertySource;
 
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 @DataJpaTest
 @TestPropertySource(locations = "classpath:application-test.yml")
@@ -48,14 +50,16 @@ class EventSpecificationTest {
         emRepository.save(em3);
 
         Specification<EventMetadata> spec = EventSpecification.searchOnName(null);
+        Specification<EventMetadata> spec2 = EventSpecification.searchOnEventId(null);
 
-        Page<EventMetadata> result = emRepository.findAll(spec, PageRequest.of(0,100));
+        Page<EventMetadata> result = emRepository.findAll(spec.or(spec2), PageRequest.of(0,100));
         assertThat(result.getTotalElements()).isEqualTo(3);
     }
 
     @DisplayName("search가 있으면 필터링 수행")
     @Test
     void searchWithSearchClause() {
+        String search = "event";
         EventFrame ef = EventFrame.of("test");
         efRepository.save(ef);
         // event 포함 ( name )
@@ -85,13 +89,13 @@ class EventSpecificationTest {
                 .name("not included")
                 .eventFrame(ef)
                 .build();
-        emRepository.save(em1);
-        emRepository.save(em2);
-        emRepository.save(em3);
+        emRepository.saveAll(List.of(em1, em2, em3, em4));
 
-        Specification<EventMetadata> spec = EventSpecification.searchOnName("event");
+        Specification<EventMetadata> spec1 = EventSpecification.searchOnName(search);
+        Specification<EventMetadata> spec2 = EventSpecification.searchOnEventId(search);
 
-        Page<EventMetadata> result = emRepository.findAll(spec, PageRequest.of(0,100));
+        Page<EventMetadata> result = emRepository.findAll(spec1.or(spec2), PageRequest.of(0,100));
+
         assertThat(result.getTotalElements()).isEqualTo(3);
     }
 }
