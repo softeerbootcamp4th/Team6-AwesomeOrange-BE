@@ -8,8 +8,6 @@ import hyundai.softeer.orange.event.dto.EventDto;
 import hyundai.softeer.orange.event.dto.EventFrameCreateRequest;
 import hyundai.softeer.orange.event.dto.group.EventEditGroup;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

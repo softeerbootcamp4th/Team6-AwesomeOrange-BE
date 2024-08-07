@@ -47,7 +47,7 @@ class EventSpecificationTest {
         emRepository.save(em2);
         emRepository.save(em3);
 
-        Specification<EventMetadata> spec = EventSpecification.withSearch(null);
+        Specification<EventMetadata> spec = EventSpecification.searchOnName(null);
 
         Page<EventMetadata> result = emRepository.findAll(spec, PageRequest.of(0,100));
         assertThat(result.getTotalElements()).isEqualTo(3);
@@ -89,7 +89,7 @@ class EventSpecificationTest {
         emRepository.save(em2);
         emRepository.save(em3);
 
-        Specification<EventMetadata> spec = EventSpecification.withSearch("event");
+        Specification<EventMetadata> spec = EventSpecification.searchOnName("event");
 
         Page<EventMetadata> result = emRepository.findAll(spec, PageRequest.of(0,100));
         assertThat(result.getTotalElements()).isEqualTo(3);

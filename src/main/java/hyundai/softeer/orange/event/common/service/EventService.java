@@ -16,6 +16,7 @@ import hyundai.softeer.orange.event.common.repository.EventSpecification;
 import hyundai.softeer.orange.event.component.EventKeyGenerator;
 import hyundai.softeer.orange.event.dto.BriefEventDto;
 import hyundai.softeer.orange.event.dto.EventDto;
+import hyundai.softeer.orange.event.dto.EventSearchHintDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -160,10 +161,12 @@ public class EventService {
                 sort
         );
 
-        var withSearch = EventSpecification.withSearch(search);
-        Page<EventMetadata> eventPage = emRepository.findAll(withSearch, pageInfo);
+        var searchOnName = EventSpecification.searchOnName(search);
+        var searchOnEventId = EventSpecification.searchOnEventId(search);
+        Page<EventMetadata> eventPage = emRepository.findAll(searchOnName.or(searchOnEventId), pageInfo);
         List<EventMetadata> events = eventPage.getContent();
 
+        // 가능하면 필요하지 않은 데이터는 fetch 하지 않도록 개선해보기
         return events.stream().map(
                 it -> BriefEventDto.of(
                         it.getEventId(),
@@ -172,6 +175,23 @@ public class EventService {
                         it.getEndTime(),
                         it.getEventType()
                 )).toList();
+    }
+
+    /**
+     * 이벤트 힌트 정보를 받는다. 관리자는 이벤트 힌트 정보를 기반으로 이벤트에 대한 추가적인 정보를 조회할 수 있다.
+     * @param search 이벤트 검색어
+     * @return 검색을 위한 힌트 정보 ( id, 이름 )
+     */
+    public List<EventSearchHintDto> searchHints(String search) {
+        var searchOnEventIdDefaultReject = EventSpecification.searchOnEventId(search, false);
+        var isDrawEvent = EventSpecification.isEventTypeOf(EventType.draw);
+        List<EventMetadata> events = emRepository.findAll(searchOnEventIdDefaultReject.and(isDrawEvent));
+
+        // 가능하면 필요하지 않은 데이터는 fetch 하지 않도록 개선해보기
+        return events.stream().map(it -> EventSearchHintDto.of(
+                it.getEventId(),
+                it.getName()
+        )).toList();
     }
 
     /**
