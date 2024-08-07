@@ -33,5 +33,9 @@ public class DrawEvent {
     private List<DrawEventMetadata> metadataList = new ArrayList<>();
 
     @OneToMany(mappedBy ="drawEvent")
+    private List<EventParticipationInfo> participationInfoList = new ArrayList<>();
+
+
+    @OneToMany(mappedBy ="drawEvent")
     private List<DrawEventWinningInfo> winningInfoList = new ArrayList<>();
 }
