@@ -24,13 +24,13 @@ public class RedisLuaFcfsService implements FcfsService {
 
     @Override
     public boolean participate(Long eventSequence, String userId) {
-        String fcfsId = FcfsUtil.keyFormatting(eventSequence.toString());
-        if (isEventEnded(fcfsId)) {
+        // 이벤트 종료 여부 확인
+        if (isEventEnded(eventSequence)) {
             stringRedisTemplate.opsForSet().add(FcfsUtil.participantFormatting(eventSequence.toString()), userId);
             return false;
         }
 
-        // 이미 선착순 이벤트에 참여한 사용자인지 확인 (참여했다면 이미 성공, 실패 결론은 고정되었기 때문)
+        // 이미 이 이벤트에 참여했는지 확인
         if(isParticipated(eventSequence, userId)) {
             throw new FcfsEventException(ErrorCode.ALREADY_PARTICIPATED);
         }
@@ -56,14 +56,14 @@ public class RedisLuaFcfsService implements FcfsService {
         Long result = stringRedisTemplate.execute(
                 RedisScript.of(script, Long.class),
                 Collections.singletonList(FcfsUtil.winnerFormatting(eventSequence.toString())),
-                String.valueOf(numberRedisTemplate.opsForValue().get(fcfsId)),
+                String.valueOf(numberRedisTemplate.opsForValue().get(FcfsUtil.keyFormatting(eventSequence.toString()))),
                 String.valueOf(timestamp),
                 userId
         );
 
         if(result == null || result <= 0) {
             stringRedisTemplate.opsForSet().add(FcfsUtil.participantFormatting(eventSequence.toString()), userId);
-            endEvent(fcfsId);  // 이벤트 종료 플래그 설정
+            endEvent(eventSequence);
             return false;
         }
 
@@ -77,11 +77,11 @@ public class RedisLuaFcfsService implements FcfsService {
         return Boolean.TRUE.equals(stringRedisTemplate.opsForSet().isMember(FcfsUtil.participantFormatting(eventSequence.toString()), userId));
     }
 
-    private boolean isEventEnded(String fcfsId) {
-        return booleanRedisTemplate.opsForValue().get(FcfsUtil.endFlagFormatting(fcfsId)) != null;
+    private boolean isEventEnded(Long eventSequence) {
+        return Boolean.TRUE.equals(booleanRedisTemplate.opsForValue().get(FcfsUtil.endFlagFormatting(eventSequence.toString())));
     }
 
-    private void endEvent(String fcfsId) {
-        booleanRedisTemplate.opsForValue().set(FcfsUtil.endFlagFormatting(fcfsId), true);
+    private void endEvent(Long eventSequence) {
+        booleanRedisTemplate.opsForValue().set(FcfsUtil.endFlagFormatting(eventSequence.toString()), true);
     }
 }
