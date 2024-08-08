@@ -65,6 +65,10 @@ public class RedisSetFcfsService implements FcfsService {
 
     // 인원수 마감 여부를 확인하며, synchronized를 통해 동시성 제어
     private synchronized boolean isEventFull(Long eventSequence) {
+        if(isEventEnded(eventSequence)){
+            return true;
+        }
+
         Long nowCount = stringRedisTemplate.opsForZSet().size(FcfsUtil.winnerFormatting(eventSequence.toString()));
         if(nowCount == null){
             throw new FcfsEventException(ErrorCode.FCFS_EVENT_NOT_FOUND);
