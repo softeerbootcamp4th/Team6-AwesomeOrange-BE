@@ -12,6 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.test.context.TestPropertySource;
 
 import java.time.LocalDateTime;
@@ -38,6 +39,9 @@ class DbFcfsServiceLoadTest {
     @Autowired
     private FcfsEventWinningInfoRepository fcfsEventWinningInfoRepository;
 
+    @Autowired
+    private RedisTemplate<String, Boolean> booleanRedisTemplate;
+
     Long numberOfWinners = 100L;
     int numberOfThreads = 200; // 스레드 수
     int numberOfUsers = 1000; // 동시 참여 사용자 수
@@ -48,6 +52,7 @@ class DbFcfsServiceLoadTest {
         fcfsEventWinningInfoRepository.deleteAll();
         eventUserRepository.deleteAll();
         fcfsEventRepository.deleteAll();
+        booleanRedisTemplate.getConnectionFactory().getConnection().flushAll();
 
         // 이벤트 생성
         FcfsEvent fcfsEvent = FcfsEvent.of(LocalDateTime.now(), LocalDateTime.now().plusDays(1), numberOfWinners, "prizeInfo", null);
