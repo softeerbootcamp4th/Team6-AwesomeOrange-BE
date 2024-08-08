@@ -28,16 +28,15 @@ public class RedisLockFcfsService implements FcfsService {
 
     @Override
     public boolean participate(Long eventSequence, String userId) {
-        String fcfsId = FcfsUtil.keyFormatting(eventSequence.toString());
-        // 불필요한 Lock 접근을 막기 위한 종료 flag 확인
-        if (isEventEnded(fcfsId)) {
+        // 이벤트 종료 여부 확인
+        if (isEventEnded(eventSequence)) {
             stringRedisTemplate.opsForSet().add(FcfsUtil.participantFormatting(eventSequence.toString()), userId);
             return false;
         }
 
-        // 이미 당첨된 사용자인지 확인
-        if(stringRedisTemplate.opsForSet().isMember(FcfsUtil.winnerFormatting(eventSequence.toString()), userId) != null) {
-            throw new FcfsEventException(ErrorCode.ALREADY_WINNER);
+        // 이미 이 이벤트에 참여했는지 확인
+        if(isParticipated(eventSequence, userId)) {
+            throw new FcfsEventException(ErrorCode.ALREADY_PARTICIPATED);
         }
 
         // 잘못된 이벤트 참여 시간
@@ -51,23 +50,22 @@ public class RedisLockFcfsService implements FcfsService {
         }
 
         // Lock을 이용한 참여 처리
-        final RLock lock = redissonClient.getLock("LOCK:" + fcfsId);
+        final RLock lock = redissonClient.getLock("LOCK:" + eventSequence);
         try {
             boolean usingLock = lock.tryLock(1L, 3L, TimeUnit.SECONDS);
             if (!usingLock) {
                 return false;
             }
 
-            final long quantity = availableCoupons(fcfsId);
+            int quantity = availableCoupons(FcfsUtil.keyFormatting(eventSequence.toString()));
             if (quantity <= 0) {
-                endEvent(fcfsId);  // 이벤트 종료 플래그 설정
+                endEvent(eventSequence);  // 이벤트 종료 플래그 설정
                 return false;
             }
 
-            numberRedisTemplate.opsForValue().decrement(fcfsId);
+            numberRedisTemplate.opsForValue().decrement(FcfsUtil.keyFormatting(eventSequence.toString()));
             stringRedisTemplate.opsForZSet().add(FcfsUtil.winnerFormatting(eventSequence.toString()), userId, System.currentTimeMillis());
             stringRedisTemplate.opsForSet().add(FcfsUtil.participantFormatting(eventSequence.toString()), userId);
-            log.info("{} - 이벤트 참여 성공, 잔여 쿠폰: {}", userId, availableCoupons(fcfsId));
             return true;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
@@ -79,16 +77,23 @@ public class RedisLockFcfsService implements FcfsService {
         }
     }
 
+    private boolean isParticipated(Long eventSequence, String userId){
+        return Boolean.TRUE.equals(stringRedisTemplate.opsForSet().isMember(FcfsUtil.participantFormatting(eventSequence.toString()), userId));
+    }
+
     private Integer availableCoupons(String key) {
-        return numberRedisTemplate.opsForValue().get(key);
+        Integer count = numberRedisTemplate.opsForValue().get(key);
+        if (count == null) {
+            throw new FcfsEventException(ErrorCode.FCFS_EVENT_NOT_FOUND);
+        }
+        return count;
     }
 
-    private boolean isEventEnded(String fcfsId) {
-        Boolean endFlag = booleanRedisTemplate.opsForValue().get(FcfsUtil.endFlagFormatting(fcfsId));
-        return Boolean.TRUE.equals(endFlag);
+    private boolean isEventEnded(Long eventSequence) {
+        return Boolean.TRUE.equals(booleanRedisTemplate.opsForValue().get(FcfsUtil.endFlagFormatting(eventSequence.toString())));
     }
 
-    private void endEvent(String fcfsId) {
-        booleanRedisTemplate.opsForValue().set(FcfsUtil.endFlagFormatting(fcfsId), true);
+    private void endEvent(Long eventSequence) {
+        booleanRedisTemplate.opsForValue().set(FcfsUtil.endFlagFormatting(eventSequence.toString()), true);
     }
 }
