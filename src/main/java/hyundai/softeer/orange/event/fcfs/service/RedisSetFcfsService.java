@@ -22,25 +22,15 @@ public class RedisSetFcfsService implements FcfsService {
 
     @Override
     public boolean participate(Long eventSequence, String userId) {
-        // 이벤트 참여 가능 여부 확인
-        validateEvent(eventSequence, userId);
-
-        // 인원 마감 여부 확인
-        if (isEventEnd(eventSequence)) {
+        // 이벤트 종료 여부 확인
+        if(isEventEnded(eventSequence)) {
             stringRedisTemplate.opsForSet().add(FcfsUtil.participantFormatting(eventSequence.toString()), userId);
             return false;
         }
 
-        stringRedisTemplate.opsForZSet().add(FcfsUtil.winnerFormatting(eventSequence.toString()), userId, System.currentTimeMillis());
-        stringRedisTemplate.opsForSet().add(FcfsUtil.participantFormatting(eventSequence.toString()), userId);
-        log.info("{} 선착순 이벤트 참여 성공", userId);
-        return true;
-    }
-
-    private void validateEvent(Long eventSequence, String userId) {
-        // 이미 당첨된 사용자인지 확인
-        if(stringRedisTemplate.opsForZSet().rank(FcfsUtil.winnerFormatting(eventSequence.toString()), userId) != null){
-            throw new FcfsEventException(ErrorCode.ALREADY_WINNER);
+        // 이미 이 이벤트에 참여했는지 확인
+        if(isParticipated(eventSequence, userId)) {
+            throw new FcfsEventException(ErrorCode.ALREADY_PARTICIPATED);
         }
 
         // 잘못된 이벤트 참여 시간
@@ -51,14 +41,30 @@ public class RedisSetFcfsService implements FcfsService {
         if (LocalDateTime.now().isBefore(LocalDateTime.parse(startTime))){
             throw new FcfsEventException(ErrorCode.INVALID_EVENT_TIME);
         }
-    }
 
-    // 이미 종료된 이벤트인지 확인하며, synchronized를 사용하여 동시성 문제 방지
-    private synchronized boolean isEventEnd(Long eventSequence) {
-        if(Boolean.TRUE.equals(booleanRedisTemplate.opsForValue().get(FcfsUtil.endFlagFormatting(eventSequence.toString())))){
-            return true;
+        // 이벤트 인원 마감 여부 확인
+        if (isEventFull(eventSequence)) {
+            stringRedisTemplate.opsForSet().add(FcfsUtil.participantFormatting(eventSequence.toString()), userId);
+            return false;
         }
 
+        stringRedisTemplate.opsForZSet().add(FcfsUtil.winnerFormatting(eventSequence.toString()), userId, System.currentTimeMillis());
+        stringRedisTemplate.opsForSet().add(FcfsUtil.participantFormatting(eventSequence.toString()), userId);
+        log.info("{} 선착순 이벤트 참여 성공", userId);
+        return true;
+    }
+
+    private boolean isParticipated(Long eventSequence, String userId) {
+        return Boolean.TRUE.equals(stringRedisTemplate.opsForSet().isMember(FcfsUtil.participantFormatting(eventSequence.toString()), userId));
+    }
+
+    // 이미 종료된 이벤트인지 확인
+    private boolean isEventEnded(Long eventSequence) {
+        return Boolean.TRUE.equals(booleanRedisTemplate.opsForValue().get(FcfsUtil.endFlagFormatting(eventSequence.toString())));
+    }
+
+    // 인원수 마감 여부를 확인하며, synchronized를 통해 동시성 제어
+    private synchronized boolean isEventFull(Long eventSequence) {
         Long nowCount = stringRedisTemplate.opsForZSet().size(FcfsUtil.winnerFormatting(eventSequence.toString()));
         if(nowCount == null){
             throw new FcfsEventException(ErrorCode.FCFS_EVENT_NOT_FOUND);
