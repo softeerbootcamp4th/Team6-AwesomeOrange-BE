@@ -53,11 +53,13 @@ public class DbFcfsService implements FcfsService{
 
         // 인원 수 초과 시 종료 flag 설정
         if(fcfsEvent.getInfos().size() >= fcfsEvent.getParticipantCount()){
+            log.info("Event Finished: {},", fcfsEvent.getInfos().size());
             endEvent(eventSequence);
             return false;
         }
 
         fcfsEventWinningInfoRepository.save(FcfsEventWinningInfo.of(fcfsEvent, eventUser));
+        log.info("Participating Success: {}, User ID: {}", eventSequence, userId);
         return true;
     }
 

@@ -57,6 +57,7 @@ public class RedisLockFcfsService implements FcfsService {
 
             int quantity = availableCoupons(FcfsUtil.keyFormatting(eventSequence.toString()));
             if (quantity <= 0) {
+                log.info("Event Finished: {},", stringRedisTemplate.opsForZSet().zCard(FcfsUtil.winnerFormatting(eventSequence.toString())));
                 endEvent(eventSequence);  // 이벤트 종료 플래그 설정
                 return false;
             }
@@ -64,6 +65,7 @@ public class RedisLockFcfsService implements FcfsService {
             numberRedisTemplate.opsForValue().decrement(FcfsUtil.keyFormatting(eventSequence.toString()));
             stringRedisTemplate.opsForZSet().add(FcfsUtil.winnerFormatting(eventSequence.toString()), userId, System.currentTimeMillis());
             stringRedisTemplate.opsForSet().add(FcfsUtil.participantFormatting(eventSequence.toString()), userId);
+            log.info("Participating Success: {}, User ID: {}", eventSequence, userId);
             return true;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();

@@ -44,13 +44,14 @@ public class RedisSetFcfsService implements FcfsService {
 
         // 이벤트 인원 마감 여부 확인
         if (isEventFull(eventSequence)) {
+            log.info("Event Finished: {},", stringRedisTemplate.opsForZSet().zCard(FcfsUtil.winnerFormatting(eventSequence.toString())));
             stringRedisTemplate.opsForSet().add(FcfsUtil.participantFormatting(eventSequence.toString()), userId);
             return false;
         }
 
         stringRedisTemplate.opsForZSet().add(FcfsUtil.winnerFormatting(eventSequence.toString()), userId, System.currentTimeMillis());
         stringRedisTemplate.opsForSet().add(FcfsUtil.participantFormatting(eventSequence.toString()), userId);
-        log.info("{} 선착순 이벤트 참여 성공", userId);
+        log.info("Participating Success: {}, User ID: {}", eventSequence, userId);
         return true;
     }
 
