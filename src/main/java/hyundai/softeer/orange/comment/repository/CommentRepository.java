@@ -1,5 +1,6 @@
 package hyundai.softeer.orange.comment.repository;
 
+import hyundai.softeer.orange.comment.dto.WriteCommentCountDto;
 import hyundai.softeer.orange.comment.entity.Comment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,4 +27,13 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
             countProjection = "c.id", // 어떤 값으로 count 셀건지 지정. 지정 안하면 count(c.*)가 되어 문제 발생.
             nativeQuery = true)
     Page<Comment> findAllByEventId(@Param("eventId") String eventId, Pageable pageable);
+
+    // 이름 매핑 필요. 필드 이름과 직접 매핑.
+    @Query(value = "SELECT c.event_user_id as eventUserId, COUNT(c.event_user_id) as count " +
+            "FROM comment c " +
+            "JOIN event_frame ef ON c.event_frame_id = ef.id " +
+            "JOIN event_metadata e ON ef.id = e.event_frame_id " +
+            "WHERE e.id = :eventRawId " +
+            "GROUP BY c.event_user_id " , nativeQuery = true)
+    List<WriteCommentCountDto> countPerEventUserByEventId(@Param("eventRawId") Long eventRawId);
 }

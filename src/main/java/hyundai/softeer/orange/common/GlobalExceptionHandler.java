@@ -8,9 +8,11 @@ import hyundai.softeer.orange.event.fcfs.exception.FcfsEventException;
 import hyundai.softeer.orange.event.url.exception.UrlException;
 import hyundai.softeer.orange.eventuser.exception.EventUserException;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -18,10 +20,13 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+    @Autowired
+    private MessageSource messageSource;
 
     @ExceptionHandler(MethodArgumentNotValidException.class) // 요청의 유효성 검사 실패 시
     @ResponseStatus(HttpStatus.BAD_REQUEST) // 400 Bad Request로 응답 반환
@@ -39,10 +44,15 @@ public class GlobalExceptionHandler {
     // TODO: messages.properties에 예외 메시지 커스터마이징할 수 있게 방법 찾아보기
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<Map<String, String>> handleInValidRequestException(MethodArgumentTypeMismatchException e) {
-        Map<String, String> errors = new HashMap<>();
-        errors.put(e.getName(), e.getLocalizedMessage());
-        return ResponseEntity.badRequest().body(errors);
+    public Map<String,String> handleInValidRequestException(MethodArgumentTypeMismatchException e) {
+        String code = e.getErrorCode();
+        String fieldName = e.getName();
+        Locale locale = LocaleContextHolder.getLocale(); // 현재 스레드의 로케일 정보를 가져온다.
+        String errorMessage = messageSource.getMessage(code, null, locale); // 국제화 된 메시지를 가져온다.
+
+        Map<String, String> error = new HashMap<>();
+        error.put(fieldName, errorMessage);
+        return error;
     }
 
     @ExceptionHandler({CommentException.class, AdminException.class, EventUserException.class, FcfsEventException.class, UrlException.class, InternalServerException.class})
