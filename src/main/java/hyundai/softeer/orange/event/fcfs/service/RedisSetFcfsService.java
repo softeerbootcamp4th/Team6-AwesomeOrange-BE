@@ -22,19 +22,20 @@ public class RedisSetFcfsService implements FcfsService {
 
     @Override
     public boolean participate(Long eventSequence, String userId) {
+        String key = eventSequence.toString();
         // 이벤트 종료 여부 확인
-        if(isEventEnded(eventSequence)) {
-            stringRedisTemplate.opsForSet().add(FcfsUtil.participantFormatting(eventSequence.toString()), userId);
+        if(isEventEnded(key)) {
+            stringRedisTemplate.opsForSet().add(FcfsUtil.participantFormatting(key), userId);
             return false;
         }
 
         // 이미 이 이벤트에 참여했는지 확인
-        if(isParticipated(eventSequence, userId)) {
+        if(isParticipated(key, userId)) {
             throw new FcfsEventException(ErrorCode.ALREADY_PARTICIPATED);
         }
 
         // 잘못된 이벤트 참여 시간
-        String startTime = stringRedisTemplate.opsForValue().get(FcfsUtil.startTimeFormatting(eventSequence.toString()));
+        String startTime = stringRedisTemplate.opsForValue().get(FcfsUtil.startTimeFormatting(key));
         if(startTime == null) {
             throw new FcfsEventException(ErrorCode.FCFS_EVENT_NOT_FOUND);
         }
@@ -43,44 +44,44 @@ public class RedisSetFcfsService implements FcfsService {
         }
 
         // 이벤트 인원 마감 여부 확인
-        if (isEventFull(eventSequence)) {
-            log.info("Event Finished: {},", stringRedisTemplate.opsForZSet().zCard(FcfsUtil.winnerFormatting(eventSequence.toString())));
-            stringRedisTemplate.opsForSet().add(FcfsUtil.participantFormatting(eventSequence.toString()), userId);
+        if (isEventFull(key)) {
+            log.info("Event Finished: {},", stringRedisTemplate.opsForZSet().zCard(FcfsUtil.winnerFormatting(key)));
+            stringRedisTemplate.opsForSet().add(FcfsUtil.participantFormatting(key), userId);
             return false;
         }
 
-        stringRedisTemplate.opsForZSet().add(FcfsUtil.winnerFormatting(eventSequence.toString()), userId, System.currentTimeMillis());
-        stringRedisTemplate.opsForSet().add(FcfsUtil.participantFormatting(eventSequence.toString()), userId);
+        stringRedisTemplate.opsForZSet().add(FcfsUtil.winnerFormatting(key), userId, System.currentTimeMillis());
+        stringRedisTemplate.opsForSet().add(FcfsUtil.participantFormatting(key), userId);
         log.info("Participating Success: {}, User ID: {}", eventSequence, userId);
         return true;
     }
 
-    private boolean isParticipated(Long eventSequence, String userId) {
-        return Boolean.TRUE.equals(stringRedisTemplate.opsForSet().isMember(FcfsUtil.participantFormatting(eventSequence.toString()), userId));
+    private boolean isParticipated(String key, String userId) {
+        return Boolean.TRUE.equals(stringRedisTemplate.opsForSet().isMember(FcfsUtil.participantFormatting(key), userId));
     }
 
     // 이미 종료된 이벤트인지 확인
-    private boolean isEventEnded(Long eventSequence) {
-        return Boolean.TRUE.equals(booleanRedisTemplate.opsForValue().get(FcfsUtil.endFlagFormatting(eventSequence.toString())));
+    private boolean isEventEnded(String key) {
+        return Boolean.TRUE.equals(booleanRedisTemplate.opsForValue().get(FcfsUtil.endFlagFormatting(key)));
     }
 
     // 인원수 마감 여부를 확인하며, synchronized를 통해 동시성 제어
-    private synchronized boolean isEventFull(Long eventSequence) {
-        if(isEventEnded(eventSequence)){
+    private synchronized boolean isEventFull(String key) {
+        if(isEventEnded(key)){
             return true;
         }
 
-        Long nowCount = stringRedisTemplate.opsForZSet().size(FcfsUtil.winnerFormatting(eventSequence.toString()));
+        Long nowCount = stringRedisTemplate.opsForZSet().size(FcfsUtil.winnerFormatting(key));
         if(nowCount == null){
             throw new FcfsEventException(ErrorCode.FCFS_EVENT_NOT_FOUND);
         }
-        Integer maxNumber = numberRedisTemplate.opsForValue().get(FcfsUtil.keyFormatting(eventSequence.toString()));
+        Integer maxNumber = numberRedisTemplate.opsForValue().get(FcfsUtil.keyFormatting(key));
         if (maxNumber == null) {
             throw new FcfsEventException(ErrorCode.FCFS_EVENT_NOT_FOUND);
         }
 
         if(nowCount >= maxNumber){
-            booleanRedisTemplate.opsForValue().set(FcfsUtil.endFlagFormatting(eventSequence.toString()), true);
+            booleanRedisTemplate.opsForValue().set(FcfsUtil.endFlagFormatting(key), true);
             return true;
         }
         return false;

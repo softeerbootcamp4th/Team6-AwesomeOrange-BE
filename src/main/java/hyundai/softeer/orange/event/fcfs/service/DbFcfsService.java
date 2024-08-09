@@ -30,8 +30,9 @@ public class DbFcfsService implements FcfsService{
     @Override
     @Transactional
     public boolean participate(Long eventSequence, String userId){
+        String key = eventSequence.toString();
         // 이벤트 종료 여부 확인
-        if (isEventEnded(eventSequence)) {
+        if (isEventEnded(key)) {
             return false;
         }
 
@@ -54,7 +55,7 @@ public class DbFcfsService implements FcfsService{
         // 인원 수 초과 시 종료 flag 설정
         if(fcfsEvent.getInfos().size() >= fcfsEvent.getParticipantCount()){
             log.info("Event Finished: {},", fcfsEvent.getInfos().size());
-            endEvent(eventSequence);
+            endEvent(key);
             return false;
         }
 
@@ -67,11 +68,11 @@ public class DbFcfsService implements FcfsService{
         return fcfsEventWinningInfoRepository.existsByEventUserIdAndFcfsEventId(userId, eventSequence);
     }
 
-    private boolean isEventEnded(Long eventSequence){
-        return Boolean.TRUE.equals((booleanRedisTemplate.opsForValue().get(FcfsUtil.endFlagFormatting(eventSequence.toString()))));
+    private boolean isEventEnded(String key){
+        return Boolean.TRUE.equals((booleanRedisTemplate.opsForValue().get(FcfsUtil.endFlagFormatting(key))));
     }
 
-    private void endEvent(Long eventSequence){
-        booleanRedisTemplate.opsForValue().set(FcfsUtil.endFlagFormatting(eventSequence.toString()), true);
+    private void endEvent(String key){
+        booleanRedisTemplate.opsForValue().set(FcfsUtil.endFlagFormatting(key), true);
     }
 }

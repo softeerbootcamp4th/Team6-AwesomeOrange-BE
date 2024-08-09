@@ -7,28 +7,28 @@ import lombok.NoArgsConstructor;
 public class FcfsUtil {
 
     // 선착순 이벤트 tag
-    public static String keyFormatting(String fcfsId) {
-        return fcfsId + ":fcfs";
+    public static String keyFormatting(String key) {
+        return key + ":fcfs";
     }
 
     // 선착순 이벤트 시작 시각 tag
-    public static String startTimeFormatting(String fcfsId) {
-        return fcfsId + "_start";
+    public static String startTimeFormatting(String key) {
+        return key + "_start";
     }
 
     // 선착순 이벤트 마감 여부 tag
-    public static String endFlagFormatting(String fcfsId) {
-        return fcfsId + "_end";
+    public static String endFlagFormatting(String key) {
+        return key + "_end";
     }
 
     // 선착순 이벤트 당첨자 tag
-    public static String winnerFormatting(String fcfsId) {
-        return fcfsId + "_winner";
+    public static String winnerFormatting(String key) {
+        return key + "_winner";
     }
 
     // 선착순 이벤트 참여자 tag
-    public static String participantFormatting(String fcfsId) {
-        return fcfsId + "_participant";
+    public static String participantFormatting(String key) {
+        return key + "_participant";
     }
 
     // 선착순 이벤트 정답 tag
