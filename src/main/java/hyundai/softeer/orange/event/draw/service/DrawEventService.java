@@ -33,14 +33,14 @@ public class DrawEventService {
 
     /**
      * eventId에 대한 추첨을 진행하는 메서드
-     * @param eventId 이벤트의 id 값
+     * @param drawEventId draw event의 id 값.
      */
     @Transactional
     @Async
-    public void draw(String eventId) {
+    public void draw(Long drawEventId) {
         // 채점 & 추첨 과정 분리하는 것도 좋을것 같다.
-        DrawEvent drawEvent = deRepository.findByEventId(eventId)
-                .orElseThrow(() -> new DrawEventException(ErrorCode.EVENT_NOT_FOUND));
+        DrawEvent drawEvent = deRepository.findById(drawEventId)
+                .orElseThrow(() -> new DrawEventException(ErrorCode.DRAW_EVENT_NOT_FOUND));
 
         // draw event의 primary key id 값
         long drawEventRawId = drawEvent.getId();
@@ -54,14 +54,19 @@ public class DrawEventService {
                 .map(it -> new PickTarget(it.getKey(), it.getValue())).toList();
 
         // 몇 등이 몇명이나 있는지 적혀 있는 정보. 등급끼리 정렬해서 1 ~ n 등 순서로 정렬
+        // 확률 높은 사람이 손해보면 안됨
         List<DrawEventMetadata> metadataList = drawEvent.getMetadataList();
         metadataList.sort(Comparator.comparing(DrawEventMetadata::getGrade));
 
         // 총 당첨 인원 설정
-        long pickCount = drawEvent.getMetadataList().stream().mapToLong(DrawEventMetadata::getCount).sum();
+        long pickCount = metadataList.stream()
+                .mapToLong(DrawEventMetadata::getCount).sum();
 
         // 당첨된 인원 구하기
         var pickedTargets = picker.pick(targets, pickCount);
+
+        // 이하 영역은 여러 작업을 동시에 수행할 수도 있음
+        // ex) 인원 등록 / 상품 문자 발송 ...
 
         // 인원 등록을 위한 작업
         List<DrawEventWinningInfoBulkInsertDto> insertTargets = new ArrayList<>();
@@ -83,6 +88,7 @@ public class DrawEventService {
                     grade,
                     drawEventRawId
             ));
+            remain--;
         }
 
         deWinningInfoRepository.insertMany(insertTargets);
