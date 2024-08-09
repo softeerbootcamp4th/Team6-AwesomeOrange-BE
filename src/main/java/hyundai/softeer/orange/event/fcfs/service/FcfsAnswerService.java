@@ -4,11 +4,9 @@ import hyundai.softeer.orange.common.ErrorCode;
 import hyundai.softeer.orange.event.fcfs.exception.FcfsEventException;
 import hyundai.softeer.orange.event.fcfs.util.FcfsUtil;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
-@Slf4j
 @RequiredArgsConstructor
 @Service
 public class FcfsAnswerService {
@@ -20,6 +18,6 @@ public class FcfsAnswerService {
         if (correctAnswer == null) {
             throw new FcfsEventException(ErrorCode.FCFS_EVENT_NOT_FOUND);
         }
-        return correctAnswer.equals(answer);
+        return correctAnswer.trim().equals(answer.trim()); // 정답 비교 시 공백을 제거
     }
 }
