@@ -5,6 +5,7 @@ import hyundai.softeer.orange.event.fcfs.exception.FcfsEventException;
 import hyundai.softeer.orange.event.fcfs.util.FcfsUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.RedisScript;
@@ -15,6 +16,7 @@ import java.util.Collections;
 
 @Slf4j
 @RequiredArgsConstructor
+@Primary
 @Service
 public class RedisLuaFcfsService implements FcfsService {
 
@@ -62,6 +64,7 @@ public class RedisLuaFcfsService implements FcfsService {
         );
 
         if(result == null || result <= 0) {
+            log.info("Event Finished: {},", stringRedisTemplate.opsForZSet().zCard(FcfsUtil.winnerFormatting(eventSequence.toString())));
             stringRedisTemplate.opsForSet().add(FcfsUtil.participantFormatting(eventSequence.toString()), userId);
             endEvent(eventSequence);
             return false;
@@ -69,7 +72,7 @@ public class RedisLuaFcfsService implements FcfsService {
 
         stringRedisTemplate.opsForZSet().add(FcfsUtil.winnerFormatting(eventSequence.toString()), userId, System.currentTimeMillis());
         stringRedisTemplate.opsForSet().add(FcfsUtil.participantFormatting(eventSequence.toString()), userId);
-        log.info("Event Sequence: {}, User ID: {}, Timestamp: {}", eventSequence, userId, timestamp);
+        log.info("Participating Success: {}, User ID: {}, Timestamp: {}", eventSequence, userId, timestamp);
         return true;
     }
 
